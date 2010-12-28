@@ -141,7 +141,7 @@ public class ThreefishTest {
         tfc.init(false, pft);
         tfc.processBlock(dataOut, 0, result, 0);
         if (!Arrays.equals(dataIn, result)) {
-            hexdump("Decrypt failed 256 00", dataIn, dataIn.length);
+            hexdump("Decrypt failed 256 00", result, result.length);
             return false;
         }
         // Next Vector
@@ -172,7 +172,7 @@ public class ThreefishTest {
         tfc.init(false, pft);
         tfc.processBlock(dataOut, 0, result, 0);
         if (!Arrays.equals(dataIn, result)) {
-            hexdump("Decrypt failed 256 01", dataIn, dataIn.length);
+            hexdump("Decrypt failed 256 01", result, result.length);
             return false;
         }
         return true;
@@ -211,7 +211,7 @@ public class ThreefishTest {
         tfc.init(false, pft);
         tfc.processBlock(dataOut, 0, result, 0);
         if (!Arrays.equals(dataIn, result)) {
-            hexdump("Decrypt failed 512 00", dataIn, dataIn.length);
+            hexdump("Decrypt failed 512 00", result, result.length);
             return false;
         }
         // Next vector
@@ -240,7 +240,7 @@ public class ThreefishTest {
         tfc.init(false, pft);
         tfc.processBlock(dataOut, 0, result, 0);
         if (!Arrays.equals(dataIn, result)) {
-            hexdump("Decrypt failed 512 01", dataIn, dataIn.length);
+            hexdump("Decrypt failed 512 01", result, result.length);
             return false;
         }
         return true;
@@ -279,7 +279,7 @@ public class ThreefishTest {
         tfc.init(false, pft);
         tfc.processBlock(dataOut, 0, result, 0);
         if (!Arrays.equals(dataIn, result)) {
-            hexdump("Decrypt failed 1024 00", dataIn, dataIn.length);
+            hexdump("Decrypt failed 1024 00", result, result.length);
             return false;
         }
         // Next vector
@@ -308,7 +308,7 @@ public class ThreefishTest {
         tfc.init(false, pft);
         tfc.processBlock(dataOut, 0, result, 0);
         if (!Arrays.equals(dataIn, result)) {
-            hexdump("Decrypt failed 1024 01", dataIn, dataIn.length);
+            hexdump("Decrypt failed 1024 01", result, result.length);
             return false;
         }
         return true;
