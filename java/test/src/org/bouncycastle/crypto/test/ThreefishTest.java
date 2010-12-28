@@ -121,12 +121,15 @@ public class ThreefishTest {
         dataOut = new byte[stateSize / 8];
         result = new byte[stateSize / 8];
 
+        // Prepare first vector
         ByteLong.PutBytes(three_256_00_input, dataIn, 0, dataIn.length);
         ByteLong.PutBytes(three_256_00_key, key, 0, key.length);
         ByteLong.PutBytes(three_256_00_result, result, 0, result.length);
 
         ParametersForThreefish pft = new ParametersForThreefish(
                 new KeyParameter(key), stateSize, three_256_00_tweak);
+        
+        // Encrypt and check
         tfc.init(true, pft);
         tfc.processBlock(dataIn, 0, dataOut, 0);
 
@@ -134,13 +137,22 @@ public class ThreefishTest {
             hexdump("Wrong cipher text 256 00", dataOut, dataOut.length);
             return false;
         }
-
+        // Decrypt and check
+        tfc.init(false, pft);
+        tfc.processBlock(dataOut, 0, result, 0);
+        if (!Arrays.equals(dataIn, result)) {
+            hexdump("Decrypt failed 256 00", dataIn, dataIn.length);
+            return false;
+        }
+        // Next Vector
         ByteLong.PutBytes(three_256_01_input, dataIn, 0, dataIn.length);
         ByteLong.PutBytes(three_256_01_key, key, 0, key.length);
         ByteLong.PutBytes(three_256_01_result, result, 0, result.length);
 
         pft = new ParametersForThreefish(new KeyParameter(key), stateSize,
                 three_256_01_tweak);
+
+        // Encrypt and check
         tfc.init(true, pft);
         tfc.processBlock(dataIn, 0, dataOut, 0);
 
@@ -150,6 +162,17 @@ public class ThreefishTest {
 
         if (!Arrays.equals(result, dataOut)) {
             hexdump("Wrong cipher text 256 01", dataOut, dataOut.length);
+            return false;
+        }
+        // Decrypt and check
+        // plaintext feed backward :-)
+        for (int i = 0; i < dataIn.length; i++)
+            dataOut[i] ^= dataIn[i];
+
+        tfc.init(false, pft);
+        tfc.processBlock(dataOut, 0, result, 0);
+        if (!Arrays.equals(dataIn, result)) {
+            hexdump("Decrypt failed 256 01", dataIn, dataIn.length);
             return false;
         }
         return true;
@@ -168,12 +191,15 @@ public class ThreefishTest {
         dataOut = new byte[stateSize / 8];
         result = new byte[stateSize / 8];
 
+        // Prepare first vector
         ByteLong.PutBytes(three_512_00_input, dataIn, 0, dataIn.length);
         ByteLong.PutBytes(three_512_00_key, key, 0, key.length);
         ByteLong.PutBytes(three_512_00_result, result, 0, result.length);
 
         ParametersForThreefish pft = new ParametersForThreefish(
                 new KeyParameter(key), stateSize, three_512_00_tweak);
+
+        // Encrypt and check
         tfc.init(true, pft);
         tfc.processBlock(dataIn, 0, dataOut, 0);
 
@@ -181,7 +207,14 @@ public class ThreefishTest {
             hexdump("Wrong cipher text 512 00", dataOut, dataOut.length);
             return false;
         }
-
+        // Decrypt and check
+        tfc.init(false, pft);
+        tfc.processBlock(dataOut, 0, result, 0);
+        if (!Arrays.equals(dataIn, result)) {
+            hexdump("Decrypt failed 512 00", dataIn, dataIn.length);
+            return false;
+        }
+        // Next vector
         ByteLong.PutBytes(three_512_01_input, dataIn, 0, dataIn.length);
         ByteLong.PutBytes(three_512_01_key, key, 0, key.length);
         ByteLong.PutBytes(three_512_01_result, result, 0, result.length);
@@ -197,6 +230,17 @@ public class ThreefishTest {
 
         if (!Arrays.equals(result, dataOut)) {
             hexdump("Wrong cipher text 512 01", dataOut, dataOut.length);
+            return false;
+        }
+        // Decrypt and check
+        // plaintext feed backward :-)
+        for (int i = 0; i < dataIn.length; i++)
+            dataOut[i] ^= dataIn[i];
+
+        tfc.init(false, pft);
+        tfc.processBlock(dataOut, 0, result, 0);
+        if (!Arrays.equals(dataIn, result)) {
+            hexdump("Decrypt failed 512 01", dataIn, dataIn.length);
             return false;
         }
         return true;
@@ -215,12 +259,15 @@ public class ThreefishTest {
         dataOut = new byte[stateSize / 8];
         result = new byte[stateSize / 8];
 
+        // Prepare first vector
         ByteLong.PutBytes(three_1024_00_input, dataIn, 0, dataIn.length);
         ByteLong.PutBytes(three_1024_00_key, key, 0, key.length);
         ByteLong.PutBytes(three_1024_00_result, result, 0, result.length);
 
         ParametersForThreefish pft = new ParametersForThreefish(
                 new KeyParameter(key), stateSize, three_1024_00_tweak);
+
+        // Encrypt and check
         tfc.init(true, pft);
         tfc.processBlock(dataIn, 0, dataOut, 0);
 
@@ -228,7 +275,14 @@ public class ThreefishTest {
             hexdump("Wrong cipher text 1024 00", dataOut, dataOut.length);
             return false;
         }
-
+        // Decrypt and check
+        tfc.init(false, pft);
+        tfc.processBlock(dataOut, 0, result, 0);
+        if (!Arrays.equals(dataIn, result)) {
+            hexdump("Decrypt failed 1024 00", dataIn, dataIn.length);
+            return false;
+        }
+        // Next vector
         ByteLong.PutBytes(three_1024_01_input, dataIn, 0, dataIn.length);
         ByteLong.PutBytes(three_1024_01_key, key, 0, key.length);
         ByteLong.PutBytes(three_1024_01_result, result, 0, result.length);
@@ -244,6 +298,17 @@ public class ThreefishTest {
 
         if (!Arrays.equals(result, dataOut)) {
             hexdump("Wrong cipher text 1024 01", dataOut, dataOut.length);
+            return false;
+        }
+        // Decrypt and check
+        // plaintext feed backward :-)
+        for (int i = 0; i < dataIn.length; i++)
+            dataOut[i] ^= dataIn[i];
+
+        tfc.init(false, pft);
+        tfc.processBlock(dataOut, 0, result, 0);
+        if (!Arrays.equals(dataIn, result)) {
+            hexdump("Decrypt failed 1024 01", dataIn, dataIn.length);
             return false;
         }
         return true;
@@ -303,5 +368,4 @@ public class ThreefishTest {
             }
         }
     }
-
 }
