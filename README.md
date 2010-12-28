@@ -6,9 +6,9 @@ Some notable features of this software suite are:
 * All three state sizes of Skein and Threefish: 256, 512, and 1024 bits
 * Support of Skein MAC
 * Variable length of hash and MAC - even in numbers of bits
-* Support of the full message length as defined in the Skein paper (2^96-1 bytes, not just a meager 4 GiB :-) )
-* Tested agains the official test vectors that the NIST CD contains (except Tree hashes)
-* The Java interface uses the well known Bouncycastle lightweight mechanisms, thus easy to
+* Support of the full message length as defined in the Skein paper (2^96 -1 bytes, not just a meager 4 GiB :-) )
+* Tested with the official test vectors that are part of the NIST CD (except Tree hashes)
+* The Java interface uses the well known Bouncy Castle lightweight mechanisms, thus easy to
   use for Java programmers.
 * The C API follows in general the lower level openSSL model  
 
@@ -27,7 +27,7 @@ C# implementation for .Net. Some Java specific programming tricks to deal with u
 types were necessary (Java does not support unsigned data types). Also Java misses `ref`
 parameters in function calls.
 
-Because I'm familiar with the BouncyCastle crypto library I decided to design the Java interface
+Because I'm familiar with the Bouncy Castle crypto library I decided to design the Java interface
 along the lines of BouncyCastle's lightweight crypto API. 
 
 ### The Threefish cipher implementation
