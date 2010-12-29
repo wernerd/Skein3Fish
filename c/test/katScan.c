@@ -1,3 +1,29 @@
+/*
+Copyright (c) 2010 Werner Dittmann
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+*/
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -28,7 +54,7 @@ typedef struct KatResult {
 #define MacKey 4
 #define Done 5
 
-static int state;
+static int state = Start;
 
 static void Show08(size_t cnt, const uint8_t* b)
 {
@@ -58,19 +84,24 @@ static void parseHeaderLine(const char* pc, KatResult_t* kr)
     int ret;
     int consumed;
 
+/*    printf("Line: %s", pc); */
     ret = sscanf(pc, ":Skein-%d: %d-bit hash, msgLen = %d%n",
                  &kr->stateSize, &kr->hashBitLength, &kr->msgLength, &consumed);
 
-    if ((kr->msgLength == 0) || (kr->msgLength % 8) != 0)
-        kr->msg = (unsigned char*)malloc((kr->msgLength >> 3) + 1);
-    else
-        kr->msg = (unsigned char*)malloc(kr->msgLength >> 3);
+    if (kr->msgLength > 0) {
+        if ((kr->msgLength % 8) != 0)
+            kr->msg = (unsigned char*)malloc((kr->msgLength >> 3) + 1);
+        else
+            kr->msg = (unsigned char*)malloc(kr->msgLength >> 3);
+    }
 
     if ((kr->hashBitLength % 8) != 0)
         kr->result = (unsigned char*)malloc((kr->hashBitLength >> 3) + 1);
     else
         kr->result = (unsigned char*)malloc(kr->hashBitLength >> 3);
 
+    kr->restOfLine = (char *)malloc(strlen(pc+consumed)+1);
+    strcpy(kr->restOfLine, pc+consumed);
     kr->msgFill = 0;
     kr->resultFill = 0;
     kr->macKeyFill = 0;
@@ -85,7 +116,7 @@ static void parseMessageLine(const char*pc, KatResult_t* kr)
     int tmp;
 
     if ((paren = strchr(pc, '(')) != NULL) {
-        if (strncmp(paren, "none", strlen("none")))
+        if (!strncmp(++paren, "none", strlen("none")))
             return;
         fprintf(stderr, "Inconsistent message line: %s\n", pc);
         exit(1);
@@ -117,12 +148,9 @@ static void parseMacKeyLine(const char*pc, KatResult_t* kr)
     int ret;
     int tmp;
 
-    if ((paren = strchr(pc, '(')) != NULL) {
-        if (strncmp(paren, "none", strlen("none")))
+    if ((paren = strchr(pc, '(')) != NULL && !strncmp(++paren, "none", strlen("none")))
             return;
-        fprintf(stderr, "Inconsistent MAC key data line: %s\n", pc);
-        exit(1);
-    }
+
     while ((ret = sscanf(pc+consumed, " %x%n", &data, &tmp)) > 0) {
         consumed += tmp;
         kr->macKey[kr->macKeyFill++] = data;
@@ -137,10 +165,8 @@ static void parseMacKeyHeaderLine(const char*pc, KatResult_t* kr)
     ret = sscanf(pc, "MAC key = %d%n",
                  &kr->macKeyLen, &consumed);
 
-    printf("ret: %d, macKeyLen %d, consumed: %d, rest: '%s'\n",
-           ret, kr->macKeyLen, consumed, pc+consumed);
-
-    kr->macKey = (unsigned char*)malloc(kr->macKeyLen);
+    if (kr->macKeyLen)
+        kr->macKey = (unsigned char*)malloc(kr->macKeyLen);
 
     state = MacKey;
 }
@@ -204,6 +230,8 @@ int fillResult(KatResult_t* kr) {
     size_t len = 512;
     size_t ret;
 
+    memset(kr, 0, sizeof(KatResult_t));
+
     while (state != Done) {
         ret = getline(&pc, &len, katFile);
         if (ret <= 3)
@@ -219,6 +247,22 @@ int fillResult(KatResult_t* kr) {
     return dataFound;
 }
 
+void freeResult(KatResult_t* kr)
+{
+    if (kr->macKey) {
+        free(kr->macKey);
+    }
+    if (kr->msg) {
+        free(kr->msg);
+    }
+    if (kr->result) {
+        free(kr->result);
+    }
+    if (kr->restOfLine) {
+        free(kr->restOfLine);
+    }
+}
+
 #ifdef KAT_SCAN_TESTING
 int main(int argc, char* argv[])
 {
@@ -227,6 +271,9 @@ int main(int argc, char* argv[])
     state = Start;
     openKatFile("/home/werner/devhome/skein3fish.git/data/skein_golden_kat.txt");
     while (fillResult(&res)) {
+        printf("%d-%d-%d-%s", res.stateSize, res.hashBitLength, res.msgLength, res.restOfLine);
+        printf("%p-%p-%p\n", res.msg, res.result, res.macKey);
+
         printf("mac key filled: %d\n", res.macKeyFill);
         Show08(res.macKeyFill, res.macKey);
         
@@ -235,6 +282,7 @@ int main(int argc, char* argv[])
         
         printf("res filled: %d\n", res.resultFill);
         Show08(res.resultFill, res.result);
+        freeResult(&res);
     }
     return 0;
 }

@@ -17,9 +17,16 @@ set (SOVERSION 0.6)
 # set true for debug and trace during CMakeLists development
 set(CMAKE_VERBOSE_MAKEFILE FALSE)
 
+# find project specific modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
 # include most of the fine stuff we need 
 include(FindPkgConfig)
 include(CheckIncludeFiles)
+
+set (DOXYFILE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
+set(DOXYFILE_DOT "YES")
+include(UseDoxygen)
 
 if ( "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
   set(LIBDIRNAME "lib64")

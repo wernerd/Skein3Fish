@@ -4,11 +4,28 @@
 
 /**
  * @file threefishApi.h
- * @brief Convenience API for Threefish
- *
- * Defines an API to use Threefish as crypto engine.
- *
+ * @brief A Threefish cipher API and its functions.
  * @{
+ *
+ * This API and the functions that implement this API simplify the usage
+ * of the Threefish cipher. The design and the way to use the functions 
+ * follow the openSSL design but at the same time take care of some Threefish
+ * specific behaviour and possibilities.
+ *
+ * These are the low level functions that deal with Threefisch blocks only.
+ * Implementations for cipher modes such as ECB, CFB, or CBC may use these 
+ * functions.
+ * 
+@code
+    // Threefish cipher context data
+    ThreefishKey_t keyCtx;
+
+    // Initialize the context
+    threefishSetKey(&keyCtx, Threefish512, key, tweak);
+
+    // Encrypt
+    threefishEncryptBlockBytes(&keyCtx, input, cipher);
+@endcode
  */
 
 #include <skein.h>
@@ -25,9 +42,9 @@ extern "C"
      * Which Threefish size to use
      */
     typedef enum ThreefishSize {
-        Threefish256 = 256,
-        Threefish512 = 512,
-        Threefish1024 = 1024
+        Threefish256 = 256,     /*!< Skein with 256 bit state */
+        Threefish512 = 512,     /*!< Skein with 512 bit state */
+        Threefish1024 = 1024    /*!< Skein with 1024 bit state */
     } ThreefishSize_t;
     
     /**

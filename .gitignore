@@ -1,4 +1,6 @@
 *~
+*.kdev4
+.kdev*
 bin/
 build/
-
+UseDoxygen/

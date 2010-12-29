@@ -29,16 +29,51 @@ parameters in function calls.
 
 Because I'm familiar with the Bouncy Castle crypto library I decided to design the Java interface
 along the lines of BouncyCastle's lightweight crypto API. 
-
-### The Threefish cipher implementation
-
-Alberto did a wonderfull job here. In his implementation he unrolled all three Threefish
-algorithms (256, 512, 1024). With the help of the standard C preprocessor the Java implementatiom
-also has unrolled Threefish algorithms that are even faster than the C# implementation
-because Java has all the code really unrolled, not just unrolled with functions calls and `ref` parameters.
-This unrolled code gives the Java JIT compiler good input for optimization.  
  
  
 ## The C implementation
 
-Stay tuned for this part - will show up in a short time.
+The C implementation provides a similar functionality as the Java implementation.
+
+Currently the Skein implementation uses the Threefish reference implementation not
+the full unrolled version. It is planned to switch to the full unrolled version to
+simplify maintenace and to mave a better software module structure.
+
+### A Skein API and its functions.
+
+This API and the functions that implement this API simplify the usage
+of Skein. The design and the way to use the functions follow the openSSL
+design but at the same time take care of some Skein specific behaviour
+and possibilities.
+ 
+The functions enable applications to create a normal Skein hashes and
+message authentication codes (MAC).
+
+### Threefish cipher API and its functions.
+
+This API and the functions that implement this API simplify the usage
+of the Threefish cipher. The design and the way to use the functions 
+follow the openSSL design but at the same time take care of some Threefish
+specific behaviour and possibilities.
+
+These are the low level functions that deal with Threefisch blocks only.
+Implementations for cipher modes such as ECB, CFB, or CBC may use these 
+functions.
+
+
+## The Threefish cipher implementation
+
+Alberto did a wonderfull job here. In his implementation he unrolled all three Threefish
+algorithms (256, 512, 1024).The Java implementatiom also has unrolled Threefish algorithms
+that are even faster than Alberto's C# implementation. This happens because Java has all 
+the code really unrolled, where C# uses function calls with `ref` parameters.
+This unrolled code gives the Java JIT compiler good input for optimization.
+
+The standalone Threefish cipher for C has the same code basis as the Java implementation.
+Therefore also full unrolled code without loop constructs.
+
+
+## Credits
+
+Credits go to the Skein team for their design of Skein and Threefish and their reference and
+optimized C implementations
