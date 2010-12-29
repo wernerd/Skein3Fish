@@ -76,7 +76,8 @@ Therefore also full unrolled code without loop constructs.
 ## Credits
 
 Credits go to
-* the Skein team for their design of Skein and Threefish and their reference and
-  optimized C implementations
-* Alberto Fajardo for his well structured C# implementation and his work to unroll the
-  Threefish algorithms.
+
+  * the Skein team for their design of Skein and Threefish and their reference and
+    optimized C implementations
+  * Alberto Fajardo for his well structured C# implementation and his work to unroll the
+    Threefish algorithms.
