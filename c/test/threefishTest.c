@@ -147,6 +147,7 @@ static int basicTest256()
     threefishDecryptBlockWords(&keyCtx, cipher, plain);
     if (memcmp(plain, three_256_00_input, Threefish256/8) != 0) {
         printf("Decrypt failed 256 00\n");
+        Show08(Threefish256/8, (const uint8_t*)cipher);
         Show08(Threefish256/8, (const uint8_t*)plain);
         return 0;
     }

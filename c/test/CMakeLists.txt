@@ -9,6 +9,9 @@ target_link_libraries(threefishTest skein3fish)
 add_executable(skeinTest skeinTest.c katScan.c)
 target_link_libraries(skeinTest skein3fish)
 
+add_executable(skeinBench skeinBench.c)
+target_link_libraries(skeinBench skein3fish)
+
 ########### install files ###############
 # None
 

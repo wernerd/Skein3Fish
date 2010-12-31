@@ -5,8 +5,11 @@ cmake_minimum_required (VERSION 2.6)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+# set(skeinBlock_src skein_block.c)
+set(skeinBlock_src skeinBlockNo3F.c)
+
 set(skein_src 
-    skein_block.c
+    ${skeinBlock_src}
     skein.c
     skeinApi.c
     )
