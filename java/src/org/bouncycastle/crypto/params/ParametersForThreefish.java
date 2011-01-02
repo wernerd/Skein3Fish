@@ -3,6 +3,10 @@ package org.bouncycastle.crypto.params;
 import org.bouncycastle.crypto.CipherParameters;
 
 public class ParametersForThreefish implements CipherParameters {
+    public final static int Threefish256 = 256;
+    public final static int Threefish512 = 512;
+    public final static int Threefish1024 = 1024;
+    
     private int stateSize;
     private CipherParameters parameters;
     private long[] tweak;

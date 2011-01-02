@@ -4,6 +4,10 @@ import org.bouncycastle.crypto.CipherParameters;
 
 public class ParametersForSkein implements CipherParameters {
 
+    public final static int Skein256 = 256;
+    public final static int Skein512 = 512;
+    public final static int Skein1024 = 1024;
+    
     private int macSize;
     private int stateSize;
     private CipherParameters parameters;
