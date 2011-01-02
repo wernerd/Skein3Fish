@@ -66,8 +66,8 @@ functions.
 Alberto did a wonderfull job here. In his implementation he unrolled all three Threefish
 algorithms (256, 512, 1024).The Java implementatiom also has unrolled Threefish algorithms
 that are even faster than Alberto's C# implementation. This happens because Java has all 
-the code really unrolled, where C# uses function calls with `ref` parameters.
-This unrolled code gives the Java JIT compiler good input for optimization.
+the code really unrolled. The C# implementation uses a lot of function calls with `ref` 
+parameters. This unrolled code gives the Java JIT compiler good input for optimization.
 
 The standalone Threefish cipher for C has the same code basis as the Java implementation.
 Therefore also full unrolled code without loop constructs.
