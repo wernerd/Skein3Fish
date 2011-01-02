@@ -58,7 +58,7 @@ public class SkeinMac implements Mac {
     }
 
     public int getMacSize() {
-        return skein.getHashSize();
+        return skein.getDigestSize();
     }
 
     public void update(byte in) throws IllegalStateException {
