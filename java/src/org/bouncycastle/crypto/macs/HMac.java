@@ -26,11 +26,11 @@ public class HMac
     private byte[] inputPad;
     private byte[] outputPad;
 
-    private static Hashtable blockLengths;
+    private static Hashtable<String, Integer> blockLengths;
     
     static
     {
-        blockLengths = new Hashtable();
+        blockLengths = new Hashtable<String, Integer>();
         
         blockLengths.put("GOST3411", new Integer(32));
         
@@ -59,7 +59,7 @@ public class HMac
             return ((ExtendedDigest)digest).getByteLength();
         }
         
-        Integer  b = (Integer)blockLengths.get(digest.getAlgorithmName());
+        Integer  b = blockLengths.get(digest.getAlgorithmName());
         
         if (b == null)
         {       
