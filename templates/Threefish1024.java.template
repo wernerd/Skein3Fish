@@ -51,8 +51,8 @@ public class Threefish1024 extends ThreefishCipher {
         public Threefish1024()
         {
             // Create the expanded key array
-            ExpandedKey = new long[EXPANDED_KEY_SIZE];
-            ExpandedKey[EXPANDED_KEY_SIZE - 1] = KeyScheduleConst;
+            expandedKey = new long[EXPANDED_KEY_SIZE];
+            expandedKey[EXPANDED_KEY_SIZE - 1] = KEY_SCHEDULE_CONST;
         }
 
         public void Encrypt(long[] input, long[] output)
@@ -66,17 +66,17 @@ public class Threefish1024 extends ThreefishCipher {
                   b10 = input[10], b11 = input[11],
                   b12 = input[12], b13 = input[13],
                   b14 = input[14], b15 = input[15];
-            long k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-                  k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-                  k4 = ExpandedKey[4], k5 = ExpandedKey[5],
-                  k6 = ExpandedKey[6], k7 = ExpandedKey[7],
-                  k8 = ExpandedKey[8], k9 = ExpandedKey[9],
-                  k10 = ExpandedKey[10], k11 = ExpandedKey[11],
-                  k12 = ExpandedKey[12], k13 = ExpandedKey[13],
-                  k14 = ExpandedKey[14], k15 = ExpandedKey[15],
-                  k16 = ExpandedKey[16];
-            long t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-                  t2 = ExpandedTweak[2];
+            long k0 = expandedKey[0], k1 = expandedKey[1],
+                  k2 = expandedKey[2], k3 = expandedKey[3],
+                  k4 = expandedKey[4], k5 = expandedKey[5],
+                  k6 = expandedKey[6], k7 = expandedKey[7],
+                  k8 = expandedKey[8], k9 = expandedKey[9],
+                  k10 = expandedKey[10], k11 = expandedKey[11],
+                  k12 = expandedKey[12], k13 = expandedKey[13],
+                  k14 = expandedKey[14], k15 = expandedKey[15],
+                  k16 = expandedKey[16];
+            long t0 = expandedTweak[0], t1 = expandedTweak[1],
+                  t2 = expandedTweak[2];
 
 
             Mix5( b0,  b1, 24, k0, k1);
@@ -750,17 +750,17 @@ public class Threefish1024 extends ThreefishCipher {
                   b10 = input[10], b11 = input[11],
                   b12 = input[12], b13 = input[13],
                   b14 = input[14], b15 = input[15];
-            long k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-                  k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-                  k4 = ExpandedKey[4], k5 = ExpandedKey[5],
-                  k6 = ExpandedKey[6], k7 = ExpandedKey[7],
-                  k8 = ExpandedKey[8], k9 = ExpandedKey[9],
-                  k10 = ExpandedKey[10], k11 = ExpandedKey[11],
-                  k12 = ExpandedKey[12], k13 = ExpandedKey[13],
-                  k14 = ExpandedKey[14], k15 = ExpandedKey[15],
-                  k16 = ExpandedKey[16];
-            long t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-                  t2 = ExpandedTweak[2];
+            long k0 = expandedKey[0], k1 = expandedKey[1],
+                  k2 = expandedKey[2], k3 = expandedKey[3],
+                  k4 = expandedKey[4], k5 = expandedKey[5],
+                  k6 = expandedKey[6], k7 = expandedKey[7],
+                  k8 = expandedKey[8], k9 = expandedKey[9],
+                  k10 = expandedKey[10], k11 = expandedKey[11],
+                  k12 = expandedKey[12], k13 = expandedKey[13],
+                  k14 = expandedKey[14], k15 = expandedKey[15],
+                  k16 = expandedKey[16];
+            long t0 = expandedTweak[0], t1 = expandedTweak[1],
+                  t2 = expandedTweak[2];
 	    long tmp;
 
             b0 -= k3;

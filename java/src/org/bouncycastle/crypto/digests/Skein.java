@@ -35,42 +35,42 @@ import org.bouncycastle.util.ByteLong;
 
 public class Skein implements ExtendedDigest {
 
-    public static final int Normal = 0;
+    public static final int NORMAL = 0;
 
-    public static final int ZeroedState = 1;
+    public static final int ZEROED_STATE = 1;
 
-    public static final int ChainedState = 2;
+    public static final int CHAINED_STATE = 2;
 
-    public static final int ChainedConfig = 3;
+    public static final int CHAINED_CONFIG = 3;
 
     private final byte[] schema = { 83, 72, 65, 51 }; // "SHA3"
 
-    private ThreefishCipher _cipher;
+    private ThreefishCipher cipher;
 
-    private int _cipherStateBits;
+    private int cipherStateBits;
 
-    private int _cipherStateBytes;
+    private int cipherStateBytes;
 
-    private int _cipherStateWords;
+    private int cipherStateWords;
 
-    private int _outputBytes;
+    private int outputBytes;
 
-    private byte[] _inputBuffer;
+    private byte[] inputBuffer;
 
-    private int _bytesFilled;
+    private int bytesFilled;
 
-    private long[] _cipherInput;
+    private long[] cipherInput;
 
-    private long[] _state;
+    private long[] state;
 
-    private int _hashSize;
+    private int hashSize;
 
-    SkeinConfig Configuration;
+    SkeinConfig configuration;
 
-    public UbiTweak UbiParameters;
+    public UbiTweak ubiParameters;
 
     public int getStateSize() {
-        return _cipherStateBits;
+        return cipherStateBits;
     }
 
     /**
@@ -90,10 +90,10 @@ public class Skein implements ExtendedDigest {
         setup(stateSize, outputSize);
 
         // Generate the configuration string
-        Configuration = new SkeinConfig(this);
-        Configuration.SetSchema(schema); // "SHA3"
-        Configuration.SetVersion(1);
-        Configuration.GenerateConfiguration();
+        configuration = new SkeinConfig(this);
+        configuration.setSchema(schema); // "SHA3"
+        configuration.setVersion(1);
+        configuration.generateConfiguration();
         initialize();
     }
 
@@ -119,26 +119,26 @@ public class Skein implements ExtendedDigest {
 
         /* compute the initial chaining state values, based on key */
         if (key.length > 0) { /* is there a key? */
-            _outputBytes = _cipherStateBytes;
-            UbiParameters.StartNewBlockType(UbiTweak.Key);
+            outputBytes = cipherStateBytes;
+            ubiParameters.startNewBlockType(UbiTweak.Key);
             update(key, 0, key.length); /* hash the key */
             byte[] preHash = finalPad();
 
             /* copy over into state variables */
-            for (int i = 0; i < _cipherStateWords; i++)
-                _state[i] = ByteLong.GetUInt64(preHash, i * 8);
+            for (int i = 0; i < cipherStateWords; i++)
+                state[i] = ByteLong.GetUInt64(preHash, i * 8);
         }
         /*
          * build/process the config block, type == CONFIG (could be precomputed
          * for each key)
          */
-        _outputBytes = (outputSize + 7) / 8;
+        outputBytes = (outputSize + 7) / 8;
 
-        Configuration = new SkeinConfig(this);
-        Configuration.SetSchema(schema); // "SHA3"
-        Configuration.SetVersion(1);
+        configuration = new SkeinConfig(this);
+        configuration.setSchema(schema); // "SHA3"
+        configuration.setVersion(1);
 
-        initialize(ChainedConfig);
+        initialize(CHAINED_CONFIG);
     }
 
     /*
@@ -151,26 +151,26 @@ public class Skein implements ExtendedDigest {
             throw new IllegalArgumentException(
                     "Skein: Output bit size must be greater than zero.");
 
-        _cipherStateBits = stateSize;
-        _cipherStateBytes = stateSize / 8;
-        _cipherStateWords = stateSize / 64;
+        cipherStateBits = stateSize;
+        cipherStateBytes = stateSize / 8;
+        cipherStateWords = stateSize / 64;
 
-        _hashSize = outputSize;
-        _outputBytes = (outputSize + 7) / 8;
+        hashSize = outputSize;
+        outputBytes = (outputSize + 7) / 8;
 
         // Figure out which cipher we need based on
         // the state size
-        _cipher = ThreefishCipher.CreateCipher(stateSize);
-        if (_cipher == null)
+        cipher = ThreefishCipher.createCipher(stateSize);
+        if (cipher == null)
             throw new IllegalArgumentException("Skein: Unsupported state size.");
 
         // Allocate buffers
-        _inputBuffer = new byte[_cipherStateBytes];
-        _cipherInput = new long[_cipherStateWords];
-        _state = new long[_cipherStateWords];
+        inputBuffer = new byte[cipherStateBytes];
+        cipherInput = new long[cipherStateWords];
+        state = new long[cipherStateWords];
 
         // Allocate tweak
-        UbiParameters = new UbiTweak();
+        ubiParameters = new UbiTweak();
     }
 
     /*
@@ -179,19 +179,19 @@ public class Skein implements ExtendedDigest {
      */
     void ProcessBlock(int bytes) {
         // Set the key to the current state
-        _cipher.SetKey(_state);
+        cipher.setKey(state);
 
         // Update tweak
-        UbiParameters.addBitsProcessed(bytes);
+        ubiParameters.addBytesProcessed(bytes);
 
-        _cipher.SetTweak(UbiParameters.getTweak());
+        cipher.setTweak(ubiParameters.getTweak());
 
         // Encrypt block
-        _cipher.Encrypt(_cipherInput, _state);
+        cipher.encrypt(cipherInput, state);
 
         // Feed-forward input with state
-        for (int i = 0; i < _cipherInput.length; i++)
-            _state[i] ^= _cipherInput[i];
+        for (int i = 0; i < cipherInput.length; i++)
+            state[i] ^= cipherInput[i];
     }
 
     /**
@@ -212,7 +212,7 @@ public class Skein implements ExtendedDigest {
     public void updateBits(byte[] array, int start, int length) 
         throws IllegalStateException {
         
-        if (UbiParameters.isBitPad())         {
+        if (ubiParameters.isBitPad())         {
             throw new IllegalStateException("Skein: partial byte only on last data block");
         }
         // if number of bits is a multiple of bytes - that's easy
@@ -225,8 +225,8 @@ public class Skein implements ExtendedDigest {
 
         // Mask partial byte and set BitPad flag before doFinal()
         byte mask = (byte)(1 << (7 - (length & 7)));        // partial byte bit mask
-        _inputBuffer[_bytesFilled-1] = (byte)((_inputBuffer[_bytesFilled-1] & (0-mask)) | mask);
-        UbiParameters.setBitPad(true);
+        inputBuffer[bytesFilled-1] = (byte)((inputBuffer[bytesFilled-1] & (0-mask)) | mask);
+        ubiParameters.setBitPad(true);
     }
 
     public void update(byte[] array, int start, int length) {
@@ -235,21 +235,21 @@ public class Skein implements ExtendedDigest {
         // Fill input buffer
         while (bytesDone < length) {
             // Do a transform if the input buffer is filled
-            if (_bytesFilled == _cipherStateBytes) {
+            if (bytesFilled == cipherStateBytes) {
                 // Copy input buffer to cipher input buffer
                 InputBufferToCipherInput();
 
                 // Process the block
-                ProcessBlock(_cipherStateBytes);
+                ProcessBlock(cipherStateBytes);
 
                 // Clear first flag, which will be set
                 // by Initialize() if this is the first transform
-                UbiParameters.setFirstBlock(false);
+                ubiParameters.setFirstBlock(false);
 
                 // Reset buffer fill count
-                _bytesFilled = 0;
+                bytesFilled = 0;
             }
-            _inputBuffer[_bytesFilled++] = array[start++];
+            inputBuffer[bytesFilled++] = array[start++];
             bytesDone++;
         }
     }
@@ -259,47 +259,47 @@ public class Skein implements ExtendedDigest {
 
         // Pad left over space in input buffer with zeros
         // and copy to cipher input buffer
-        for (i = _bytesFilled; i < _inputBuffer.length; i++)
-            _inputBuffer[i] = 0;
+        for (i = bytesFilled; i < inputBuffer.length; i++)
+            inputBuffer[i] = 0;
 
         InputBufferToCipherInput();
 
         // Do final message block
-        UbiParameters.setFinalBlock(true);
-        ProcessBlock(_bytesFilled);
+        ubiParameters.setFinalBlock(true);
+        ProcessBlock(bytesFilled);
 
         // Clear cipher input
-        for (i = 0; i < _cipherInput.length; i++)
-            _cipherInput[i] = 0;
+        for (i = 0; i < cipherInput.length; i++)
+            cipherInput[i] = 0;
 
         // Do output block counter mode output
         int j;
 
-        byte[] hash = new byte[_outputBytes];
-        long[] oldState = new long[_cipherStateWords];
+        byte[] hash = new byte[outputBytes];
+        long[] oldState = new long[cipherStateWords];
 
         // Save old state
-        for (j = 0; j < _state.length; j++)
-            oldState[j] = _state[j];
+        for (j = 0; j < state.length; j++)
+            oldState[j] = state[j];
 
-        for (i = 0; i < _outputBytes; i += _cipherStateBytes) {
-            UbiParameters.StartNewBlockType(UbiTweak.Out);
-            UbiParameters.setFinalBlock(true);
+        for (i = 0; i < outputBytes; i += cipherStateBytes) {
+            ubiParameters.startNewBlockType(UbiTweak.Out);
+            ubiParameters.setFinalBlock(true);
             ProcessBlock(8);
 
             // Output a chunk of the hash
-            int outputSize = _outputBytes - i;
-            if (outputSize > _cipherStateBytes)
-                outputSize = _cipherStateBytes;
+            int outputSize = outputBytes - i;
+            if (outputSize > cipherStateBytes)
+                outputSize = cipherStateBytes;
 
-            ByteLong.PutBytes(_state, hash, i, outputSize);
+            ByteLong.PutBytes(state, hash, i, outputSize);
 
             // Restore old state
-            for (j = 0; j < _state.length; j++)
-                _state[j] = oldState[j];
+            for (j = 0; j < state.length; j++)
+                state[j] = oldState[j];
 
             // Increment counter
-            _cipherInput[0]++;
+            cipherInput[0]++;
         }
         reset();
         return hash;
@@ -315,24 +315,24 @@ public class Skein implements ExtendedDigest {
 
         // Pad left over space in input buffer with zeros
         // and copy to cipher input buffer
-        for (i = _bytesFilled; i < _inputBuffer.length; i++)
-            _inputBuffer[i] = 0;
+        for (i = bytesFilled; i < inputBuffer.length; i++)
+            inputBuffer[i] = 0;
 
         InputBufferToCipherInput();
 
         // Do final message block
-        UbiParameters.setFinalBlock(true);
-        ProcessBlock(_bytesFilled);
+        ubiParameters.setFinalBlock(true);
+        ProcessBlock(bytesFilled);
 
-        byte[] data = new byte[_outputBytes];
+        byte[] data = new byte[outputBytes];
 
-        for (i = 0; i < _outputBytes; i += _cipherStateBytes) {
+        for (i = 0; i < outputBytes; i += cipherStateBytes) {
             // Output a chunk of the hash
-            int outputSize = _outputBytes - i;
-            if (outputSize > _cipherStateBytes)
-                outputSize = _cipherStateBytes;
+            int outputSize = outputBytes - i;
+            if (outputSize > cipherStateBytes)
+                outputSize = cipherStateBytes;
 
-            ByteLong.PutBytes(_state, data, i, outputSize);
+            ByteLong.PutBytes(state, data, i, outputSize);
         }
         return data;
     }
@@ -343,31 +343,31 @@ public class Skein implements ExtendedDigest {
      */
     private void initialize(int initializationType) {
         switch (initializationType) {
-        case Normal:
+        case NORMAL:
             // Normal initialization
             initialize();
             return;
 
-        case ZeroedState:
+        case ZEROED_STATE:
             // Start with a all zero state
-            for (int i = 0; i < _state.length; i++)
-                _state[i] = 0;
+            for (int i = 0; i < state.length; i++)
+                state[i] = 0;
             break;
 
-        case ChainedState:
+        case CHAINED_STATE:
             // Keep the state as it is and do nothing
             break;
 
-        case ChainedConfig:
+        case CHAINED_CONFIG:
             // Generate a chained configuration
-            Configuration.GenerateConfiguration(_state);
+            configuration.generateConfiguration(state);
             // Continue initialization
             initialize();
             return;
         }
 
         // Reset bytes filled
-        _bytesFilled = 0;
+        bytesFilled = 0;
     }
 
     /*
@@ -375,14 +375,14 @@ public class Skein implements ExtendedDigest {
      */
     private final void initialize() {
         // Copy the configuration value to the state
-        for (int i = 0; i < _state.length; i++)
-            _state[i] = Configuration.ConfigValue[i];
+        for (int i = 0; i < state.length; i++)
+            state[i] = configuration.ConfigValue[i];
 
         // Set up tweak for message block
-        UbiParameters.StartNewBlockType(UbiTweak.Message);
+        ubiParameters.startNewBlockType(UbiTweak.Message);
 
         // Reset bytes filled
-        _bytesFilled = 0;
+        bytesFilled = 0;
     }
 
     /**
@@ -403,29 +403,29 @@ public class Skein implements ExtendedDigest {
      */
     public final void initialize(long[] externalState) {
         // Copy an external saved state value to internal state
-        for (int i = 0; i < _state.length; i++)
-            _state[i] = externalState[i];
+        for (int i = 0; i < state.length; i++)
+            state[i] = externalState[i];
 
         // Set up tweak for message block
-        UbiParameters.StartNewBlockType(UbiTweak.Message);
+        ubiParameters.startNewBlockType(UbiTweak.Message);
 
         // Reset bytes filled
-        _bytesFilled = 0;
+        bytesFilled = 0;
     }
 
     // Moves the byte input buffer to the long cipher input
     void InputBufferToCipherInput() {
-        for (int i = 0; i < _cipherStateWords; i++)
-            _cipherInput[i] = ByteLong.GetUInt64(_inputBuffer, i * 8);
+        for (int i = 0; i < cipherStateWords; i++)
+            cipherInput[i] = ByteLong.GetUInt64(inputBuffer, i * 8);
     }
 
     /**
      * The state size of this Skein instance.
      * 
-     * @return the _cipherStateBits
+     * @return the cipherStateBits
      */
-    public int get_cipherStateBits() {
-        return _cipherStateBits;
+    public int getcipherStateBits() {
+        return cipherStateBits;
     }
 
     /**
@@ -433,15 +433,15 @@ public class Skein implements ExtendedDigest {
      * @return the hashSize int bits
      */
     public int getHashSize() {
-        return _hashSize;
+        return hashSize;
     }
 
     public String getAlgorithmName() {
-        return "Skein" + _cipherStateBits;
+        return "Skein" + cipherStateBits;
     }
 
     public int getDigestSize() {
-        return _outputBytes;
+        return outputBytes;
     }
 
     public void update(byte in) {
@@ -460,7 +460,7 @@ public class Skein implements ExtendedDigest {
     }
 
     public int getByteLength() {
-        return _cipherStateBytes;
+        return cipherStateBytes;
     }
     
     /**
@@ -475,15 +475,15 @@ public class Skein implements ExtendedDigest {
      * @see initialize(long[] externalState)
      */
     public long[] getState() {
-        long[] s = new long[_state.length];
+        long[] s = new long[state.length];
         // Copy state values to external state
-        for (int i = 0; i < _state.length; i++)
-            s[i] = _state[i];
+        for (int i = 0; i < state.length; i++)
+            s[i] = state[i];
         return s;
     }
     
     class SkeinConfig {
-        private final int _stateSize;
+        private final int stateSize;
 
         long[] ConfigValue;
 
@@ -492,54 +492,54 @@ public class Skein implements ExtendedDigest {
 
         SkeinConfig(Skein sourceHash)
         {
-            _stateSize = sourceHash.get_cipherStateBits();
+            stateSize = sourceHash.getcipherStateBits();
 
             // Allocate config value
-            ConfigValue = new long[_stateSize / 8];
+            ConfigValue = new long[stateSize / 8];
 
             // Set the state size for the configuration
             ConfigString = new long[ConfigValue.length];
             ConfigString[1] = sourceHash.getHashSize();
         }
 
-        void GenerateConfiguration()
+        void generateConfiguration()
         {
-            ThreefishCipher cipher = ThreefishCipher.CreateCipher(_stateSize);
+            ThreefishCipher cipher = ThreefishCipher.createCipher(stateSize);
             UbiTweak tweak = new UbiTweak();
 
             // Initialize the tweak value
-            tweak.StartNewBlockType(UbiTweak.Config);
+            tweak.startNewBlockType(UbiTweak.Config);
             tweak.setFinalBlock(true);
             tweak.setBitsProcessed(32);
 
-            cipher.SetTweak(tweak.getTweak());
-            cipher.Encrypt(ConfigString, ConfigValue);
+            cipher.setTweak(tweak.getTweak());
+            cipher.encrypt(ConfigString, ConfigValue);
 
             ConfigValue[0] ^= ConfigString[0]; 
             ConfigValue[1] ^= ConfigString[1];
             ConfigValue[2] ^= ConfigString[2];
         }
 
-        void GenerateConfiguration(long[] initialState)
+        void generateConfiguration(long[] initialState)
         {
-            ThreefishCipher cipher = ThreefishCipher.CreateCipher(_stateSize);
+            ThreefishCipher cipher = ThreefishCipher.createCipher(stateSize);
             UbiTweak tweak = new UbiTweak();
 
             // Initialize the tweak value
-            tweak.StartNewBlockType(UbiTweak.Config);
+            tweak.startNewBlockType(UbiTweak.Config);
             tweak.setFinalBlock(true);
             tweak.setBitsProcessed(32);
 
-            cipher.SetKey(initialState);
-            cipher.SetTweak(tweak.getTweak());
-            cipher.Encrypt(ConfigString, ConfigValue);
+            cipher.setKey(initialState);
+            cipher.setTweak(tweak.getTweak());
+            cipher.encrypt(ConfigString, ConfigValue);
 
             ConfigValue[0] ^= ConfigString[0];
             ConfigValue[1] ^= ConfigString[1];
             ConfigValue[2] ^= ConfigString[2];
         }
 
-        void SetSchema(byte[] schema) throws IllegalArgumentException
+        void setSchema(byte[] schema) throws IllegalArgumentException
         {
             if (schema.length != 4) 
                 throw new IllegalArgumentException("Skein configuration: Schema must be 4 bytes.");
@@ -557,7 +557,7 @@ public class Skein implements ExtendedDigest {
             ConfigString[0] = n;
         }
 
-        void SetVersion(int version) throws IllegalArgumentException
+        void setVersion(int version) throws IllegalArgumentException
         {
             if (version < 0 || version > 3)
                 throw new IllegalArgumentException("Skein configuration: Version must be between 0 and 3, inclusive.");
@@ -566,19 +566,19 @@ public class Skein implements ExtendedDigest {
             ConfigString[0] |= (long)version << 32;
         }
 
-        void SetTreeLeafSize(byte size)
+        void setTreeLeafSize(byte size)
         {
             ConfigString[2] &= ~(long)0xff;
             ConfigString[2] |= size;
         }
 
-        void SetTreeFanOutSize(byte size)
+        void setTreeFanOutSize(byte size)
         {
             ConfigString[2] &= ~((long)0xff << 8);
             ConfigString[2] |= (long)size << 8;
         }
 
-        void SetMaxTreeHeight(byte height) throws IllegalArgumentException
+        void setMaxTreeHeight(byte height) throws IllegalArgumentException
         {
             if (height == 1)
                 throw new IllegalArgumentException("Skein configuration: Tree height must be zero or greater than 1.");
@@ -600,7 +600,7 @@ public class Skein implements ExtendedDigest {
 
         private static final long T1FlagBitPad = ((long) 1 << 55);
 
-        private long[] Tweak = new long[2];
+        private long[] tweak = new long[2];
 
         UbiTweak() {
         }
@@ -608,8 +608,8 @@ public class Skein implements ExtendedDigest {
         /**
          * Get status of the first block flag.
          */
-        boolean IsFirstBlock() {
-            return (Tweak[1] & T1FlagFirst) != 0;
+        boolean isFirstBlock() {
+            return (tweak[1] & T1FlagFirst) != 0;
         }
 
         /**
@@ -617,16 +617,16 @@ public class Skein implements ExtendedDigest {
          */
         void setFirstBlock(boolean value) {
             if (value)
-                Tweak[1] |= T1FlagFirst;
+                tweak[1] |= T1FlagFirst;
             else
-                Tweak[1] &= ~T1FlagFirst;
+                tweak[1] &= ~T1FlagFirst;
         }
 
         /**
          * Gets status of the final block flag.
          */
         boolean isFinalBlock() {
-            return (Tweak[1] & T1FlagFinal) != 0;
+            return (tweak[1] & T1FlagFinal) != 0;
         }
 
         /**
@@ -634,16 +634,16 @@ public class Skein implements ExtendedDigest {
          */
         void setFinalBlock(boolean value) {
             if (value)
-                Tweak[1] |= T1FlagFinal;
+                tweak[1] |= T1FlagFinal;
             else
-                Tweak[1] &= ~T1FlagFinal;
+                tweak[1] &= ~T1FlagFinal;
         }
 
         /**
          * Gets status of the final block flag.
          */
         boolean isBitPad() {
-            return (Tweak[1] & T1FlagBitPad) != 0;
+            return (tweak[1] & T1FlagBitPad) != 0;
         }
 
         /**
@@ -651,76 +651,110 @@ public class Skein implements ExtendedDigest {
          */
         void setBitPad(boolean value) {
             if (value)
-                Tweak[1] |= T1FlagBitPad;
+                tweak[1] |= T1FlagBitPad;
             else
-                Tweak[1] &= ~T1FlagBitPad;
+                tweak[1] &= ~T1FlagBitPad;
         }
-        // / <summary>
-        // / Gets or sets the current tree level.
-        // / </summary>
+        
+        /**
+         * Gets  the current tree level.
+         */
         byte getTreeLevel() {
-            return (byte) ((Tweak[1] >> 48) & 0x7f);
+            return (byte) ((tweak[1] >> 48) & 0x7f);
         }
 
+        /**
+         * Set the current tree level.
+         * 
+         * @param value
+         *          the tree level
+         */
         void setTreeLevel(int value) throws Exception {
             if (value > 63)
                 throw new Exception(
                         "Tree level must be between 0 and 63, inclusive.");
 
-            Tweak[1] &= ~((long) 0x7f << 48);
-            Tweak[1] |= (long) value << 48;
+            tweak[1] &= ~((long) 0x7f << 48);
+            tweak[1] |= (long) value << 48;
         }
 
-        // / <summary>
-        // / Gets or sets the number of bits processed so far, inclusive.
-        // / </summary>
+        /**
+         * Gets the number of bytes processed so far, inclusive.
+         * 
+         * @return
+         *      Number of processed bytes.
+         */
         long[] getBitsProcessed() {
             long[] retval = new long[2];
-            retval[0] = Tweak[0];
-            retval[1] = Tweak[1] & 0xffffffffL;
+            retval[0] = tweak[0];
+            retval[1] = tweak[1] & 0xffffffffL;
             return retval;
         }
 
+        /**
+         * Set the number of bytes processed so far.
+         * 
+         * @param value
+         *        The number of bits to set.
+         */
         void setBitsProcessed(long value) {
-            Tweak[0] = value;
+            tweak[0] = value;
+            tweak[1] &= 0xffffffff00000000L;
         }
 
-        void addBitsProcessed(int value) {
+        /**
+         * Add number of processed bytes.
+         * 
+         * Adds the integere value to the 96-bit field of processed
+         * bytes.
+         *  
+         * @param value
+         *        Number of processed bytes.
+         */
+        void addBytesProcessed(int value) {
             final int len = 3;
             long carry = value;
             
             long words[] = new long[len];
-            words[0] = Tweak[0] & 0xffffffffL;
-            words[1] = ((Tweak[0] >>> 32) & 0xffffffffL);
-            words[2] = (Tweak[1] & 0xffffffffL);
+            words[0] = tweak[0] & 0xffffffffL;
+            words[1] = ((tweak[0] >>> 32) & 0xffffffffL);
+            words[2] = (tweak[1] & 0xffffffffL);
 
             for (int i = 0; i < len; i++) {
                 carry += words[i];
                 words[i] = carry;
                 carry >>= 32;
             }        
-            Tweak[0] = words[0] & 0xffffffffL;
-            Tweak[0] |= (words[1] & 0xffffffffL) << 32;
-            Tweak[1] |= words[2] & 0xffffffffL;
+            tweak[0] = words[0] & 0xffffffffL;
+            tweak[0] |= (words[1] & 0xffffffffL) << 32;
+            tweak[1] |= words[2] & 0xffffffffL;
         }
 
-        // / <summary>
-        // / Gets or sets the current UBI block type.
-        // / </summary>
+        /**
+         * Get the current UBI block type.
+         */
         long getBlockType() {
-            return ((Tweak[1] >> 56) & 0x3f);
+            return ((tweak[1] >> 56) & 0x3f);
         }
 
+        /**
+         * Set the current UBI block type.
+         * 
+         * @param value
+         *        Block type 
+         */
         void setBlockType(long value) {
-            Tweak[1] = value << 56;
+            tweak[1] = value << 56;
         }
 
-        // / <summary>
-        // / Starts a new UBI block type by setting BitsProcessed to zero, setting
-        // the first flag, and setting the block type.
-        // / </summary>
-        // / <param name="type">The UBI block type of the new block.</param>
-        void StartNewBlockType(long type) {
+        /**
+         * Starts a new UBI block type by setting BitsProcessed to zero, setting
+         * the first flag, and setting the block type.
+         *
+         * @param type
+         *     The UBI block type of the new block
+         */
+        void startNewBlockType(long type) {
             setBitsProcessed(0);
             setBlockType(type);
             setFirstBlock(true);
@@ -730,7 +764,7 @@ public class Skein implements ExtendedDigest {
          * @return the tweak
          */
         long[] getTweak() {
-            return Tweak;
+            return tweak;
         }
 
         /**
@@ -738,7 +772,7 @@ public class Skein implements ExtendedDigest {
          *            the tweak to set
          */
         void setTweak(long[] tweak) {
-            Tweak = tweak;
+            this.tweak = tweak;
         }
 
     }

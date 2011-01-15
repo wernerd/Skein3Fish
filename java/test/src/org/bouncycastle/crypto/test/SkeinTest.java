@@ -68,7 +68,7 @@ public class SkeinTest {
 
                 sm.init(pfs);
                 sm.updateBits(kr.msg, 0, kr.msgLength);
-                byte[] mac = new byte[(sm.getMacSize() + 7) / 8];
+                byte[] mac = new byte[sm.getMacSize()];
                 sm.doFinal(mac, 0);
 
                 if (!Arrays.equals(mac, kr.result)) {

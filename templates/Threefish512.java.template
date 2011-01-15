@@ -45,15 +45,15 @@ The same permissions granted.
 
 public class Threefish512  extends ThreefishCipher {
 
-    private final int CipherSize = 512;
-    private final int CipherQwords = CipherSize / 64;
-    private final int ExpandedKeySize = CipherQwords + 1;
+    private final int CIPHER_SIZE = 512;
+    private final int CIPHER_QWORDS = CIPHER_SIZE / 64;
+    private final int EXPANDED_KEY_SIZE = CIPHER_QWORDS + 1;
 
     public Threefish512()
     {
         // Create the expanded key array
-        ExpandedKey = new long[ExpandedKeySize];
-        ExpandedKey[ExpandedKeySize - 1] = KeyScheduleConst;
+        expandedKey = new long[EXPANDED_KEY_SIZE];
+        expandedKey[EXPANDED_KEY_SIZE - 1] = KEY_SCHEDULE_CONST;
     }
 
     public void Encrypt(long[] input, long[] output)
@@ -63,13 +63,13 @@ public class Threefish512  extends ThreefishCipher {
         b2 = input[2], b3 = input[3],
         b4 = input[4], b5 = input[5],
         b6 = input[6], b7 = input[7];
-        long k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-        k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-        k4 = ExpandedKey[4], k5 = ExpandedKey[5],
-        k6 = ExpandedKey[6], k7 = ExpandedKey[7],
-        k8 = ExpandedKey[8];
-        long t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-        t2 = ExpandedTweak[2];
+        long k0 = expandedKey[0], k1 = expandedKey[1],
+        k2 = expandedKey[2], k3 = expandedKey[3],
+        k4 = expandedKey[4], k5 = expandedKey[5],
+        k6 = expandedKey[6], k7 = expandedKey[7],
+        k8 = expandedKey[8];
+        long t0 = expandedTweak[0], t1 = expandedTweak[1],
+        t2 = expandedTweak[2];
 
         Mix5( b0,  b1, 46, k0, k1);
         Mix5( b2,  b3, 36, k2, k3);
@@ -378,13 +378,13 @@ public class Threefish512  extends ThreefishCipher {
         b2 = input[2], b3 = input[3],
         b4 = input[4], b5 = input[5],
         b6 = input[6], b7 = input[7];
-        long k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-        k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-        k4 = ExpandedKey[4], k5 = ExpandedKey[5],
-        k6 = ExpandedKey[6], k7 = ExpandedKey[7],
-        k8 = ExpandedKey[8];
-        long t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-        t2 = ExpandedTweak[2];
+        long k0 = expandedKey[0], k1 = expandedKey[1],
+        k2 = expandedKey[2], k3 = expandedKey[3],
+        k4 = expandedKey[4], k5 = expandedKey[5],
+        k6 = expandedKey[6], k7 = expandedKey[7],
+        k8 = expandedKey[8];
+        long t0 = expandedTweak[0], t1 = expandedTweak[1],
+        t2 = expandedTweak[2];
 	long tmp;
 
         b0 -= k0;

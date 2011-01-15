@@ -39,9 +39,9 @@ import org.bouncycastle.util.ByteLong;
 
 public class ThreefishCipher implements BlockCipher {
 
-    static final long KeyScheduleConst = 0x1BD11BDAA9FC1A22L;
+    static final long KEY_SCHEDULE_CONST = 0x1BD11BDAA9FC1A22L;
 
-    static final int ExpandedTweakSize = 3;
+    static final int EXPANDED_TWEAK_SIZE = 3;
 
     private ThreefishCipher cipher;
     
@@ -49,16 +49,16 @@ public class ThreefishCipher implements BlockCipher {
     
     private int stateSize;
     
-    long[] ExpandedKey;
+    long[] expanedKey;
 
-    long[] ExpandedTweak;
+    long[] expanedTweak;
 
     private long[] cipherIn;
     
     private long[] cipherOut;
     
     public ThreefishCipher() {
-        ExpandedTweak = new long[ExpandedTweakSize];
+        expanedTweak = new long[EXPANDED_TWEAK_SIZE];
     }
 
     /*
@@ -77,24 +77,24 @@ public class ThreefishCipher implements BlockCipher {
     // protected static void UnMix5(long a, long b, int r, long k0, long k1)
     // {}
 
-    public void SetTweak(long[] tweak) {
-        ExpandedTweak[0] = tweak[0];
-        ExpandedTweak[1] = tweak[1];
-        ExpandedTweak[2] = tweak[0] ^ tweak[1];
+    public void setTweak(long[] tweak) {
+        expanedTweak[0] = tweak[0];
+        expanedTweak[1] = tweak[1];
+        expanedTweak[2] = tweak[0] ^ tweak[1];
     }
 
-    public void SetKey(long[] key) {
+    public void setKey(long[] key) {
         int i;
-        long parity = KeyScheduleConst;
+        long parity = KEY_SCHEDULE_CONST;
 
-        for (i = 0; i < ExpandedKey.length - 1; i++) {
-            ExpandedKey[i] = key[i];
+        for (i = 0; i < expanedKey.length - 1; i++) {
+            expanedKey[i] = key[i];
             parity ^= key[i];
         }
-        ExpandedKey[i] = parity;
+        expanedKey[i] = parity;
     }
 
-    public static ThreefishCipher CreateCipher(int stateSize) {
+    public static ThreefishCipher createCipher(int stateSize) {
         switch (stateSize) {
         case 256:
             return new ThreefishCipher().new Threefish256();
@@ -138,14 +138,14 @@ public class ThreefishCipher implements BlockCipher {
             long[] tweak = pft.getTweak();
             if (tweak == null)
                 throw new IllegalArgumentException("Threefish: tweak data not set");
-            cipher.SetTweak(tweak);
+            cipher.setTweak(tweak);
             
             // Get a long array for cipher key and moves the byte key buffer to it
             long[] keyLong = new long[stateSize / 64];
             for (int i = 0; i < keyLong.length; i++)
                 keyLong[i] = ByteLong.GetUInt64(key, i * 8);
 
-            cipher.SetKey(keyLong);
+            cipher.setKey(keyLong);
 
             this.forEncryption = forEncryption;
             
@@ -172,7 +172,7 @@ public class ThreefishCipher implements BlockCipher {
         int blockLenByte = stateSize / 8;
         int blockLenLong = stateSize / 64;
         
-        if (cipher.ExpandedKey == null)
+        if (cipher.expanedKey == null)
         {
             throw new IllegalStateException("Threefish: engine not initialised");
         }
@@ -191,11 +191,11 @@ public class ThreefishCipher implements BlockCipher {
 
         if (forEncryption)
         {
-            cipher.Encrypt(cipherIn, cipherOut);
+            cipher.encrypt(cipherIn, cipherOut);
         }
         else
         {
-            cipher.Decrypt(cipherIn, cipherOut);
+            cipher.decrypt(cipherIn, cipherOut);
         }
         ByteLong.PutBytes(cipherOut, out, outOff, blockLenByte);
 
@@ -216,7 +216,7 @@ public class ThreefishCipher implements BlockCipher {
      * @param output
      *     The ciphertext output.
      */
-    public void Encrypt(long[] input, long[] output) {}
+    public void encrypt(long[] input, long[] output) {}
 
     /**
      * Decrypt function
@@ -228,7 +228,7 @@ public class ThreefishCipher implements BlockCipher {
      * @param output
      *     The plaintext output.
      */
-    public void Decrypt(long[] input, long[] output) {}
+    public void decrypt(long[] input, long[] output) {}
 
     /*
      * Note: do not edit the unrolled Threefish operations below - I use
@@ -247,27 +247,27 @@ public class ThreefishCipher implements BlockCipher {
      */
     public class Threefish256 extends ThreefishCipher {
 
-        final int CipherSize = 256;
-        final int CipherQwords = CipherSize / 64;
-        final int ExpandedKeySize = CipherQwords + 1;
+        final int CIPHER_SIZE = 256;
+        final int CIPHER_QWORDS = CIPHER_SIZE / 64;
+        final int EXPANDED_KEY_SIZE = CIPHER_QWORDS + 1;
 
         public Threefish256()
         {
 
-            ExpandedKey = new long[ExpandedKeySize];
-            ExpandedKey[ExpandedKeySize - 1] = KeyScheduleConst;
+            expanedKey = new long[EXPANDED_KEY_SIZE];
+            expanedKey[EXPANDED_KEY_SIZE - 1] = KEY_SCHEDULE_CONST;
         }
 
-        public void Encrypt(long[] input, long[] output)
+        public void encrypt(long[] input, long[] output)
         {
 
             long b0 = input[0], b1 = input[1],
             b2 = input[2], b3 = input[3];
-            long k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-            k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-            k4 = ExpandedKey[4];
-            long t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-            t2 = ExpandedTweak[2];
+            long k0 = expanedKey[0], k1 = expanedKey[1],
+            k2 = expanedKey[2], k3 = expanedKey[3],
+            k4 = expanedKey[4];
+            long t0 = expanedTweak[0], t1 = expanedTweak[1],
+            t2 = expanedTweak[2];
 
             b1 += k1 + t0; b0 += b1 + k0; b1 = ((b1 << 14) | (b1 >>> (64 - 14))) ^ b0;
             b3 += k3; b2 += b3 + k2 + t1; b3 = ((b3 << 16) | (b3 >>> (64 - 16))) ^ b2;
@@ -420,16 +420,16 @@ public class ThreefishCipher implements BlockCipher {
             output[3] = b3 + k1 + 18;
         }
 
-        public void Decrypt(long[] input, long[] output)
+        public void decrypt(long[] input, long[] output)
         {
 
             long b0 = input[0], b1 = input[1],
             b2 = input[2], b3 = input[3];
-            long k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-            k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-            k4 = ExpandedKey[4];
-            long t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-            t2 = ExpandedTweak[2];
+            long k0 = expanedKey[0], k1 = expanedKey[1],
+            k2 = expanedKey[2], k3 = expanedKey[3],
+            k4 = expanedKey[4];
+            long t0 = expanedTweak[0], t1 = expanedTweak[1],
+            t2 = expanedTweak[2];
             long tmp;
 
             b0 -= k3;
@@ -597,31 +597,31 @@ public class ThreefishCipher implements BlockCipher {
      */
     public class Threefish512 extends ThreefishCipher {
 
-        private final int CipherSize = 512;
-        private final int CipherQwords = CipherSize / 64;
-        private final int ExpandedKeySize = CipherQwords + 1;
+        private final int CIPHER_SIZE = 512;
+        private final int CIPHER_QWORDS = CIPHER_SIZE / 64;
+        private final int EXPANDED_KEY_SIZE = CIPHER_QWORDS + 1;
 
         public Threefish512()
         {
 
-            ExpandedKey = new long[ExpandedKeySize];
-            ExpandedKey[ExpandedKeySize - 1] = KeyScheduleConst;
+            expanedKey = new long[EXPANDED_KEY_SIZE];
+            expanedKey[EXPANDED_KEY_SIZE - 1] = KEY_SCHEDULE_CONST;
         }
 
-        public void Encrypt(long[] input, long[] output)
+        public void encrypt(long[] input, long[] output)
         {
 
             long b0 = input[0], b1 = input[1],
             b2 = input[2], b3 = input[3],
             b4 = input[4], b5 = input[5],
             b6 = input[6], b7 = input[7];
-            long k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-            k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-            k4 = ExpandedKey[4], k5 = ExpandedKey[5],
-            k6 = ExpandedKey[6], k7 = ExpandedKey[7],
-            k8 = ExpandedKey[8];
-            long t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-            t2 = ExpandedTweak[2];
+            long k0 = expanedKey[0], k1 = expanedKey[1],
+            k2 = expanedKey[2], k3 = expanedKey[3],
+            k4 = expanedKey[4], k5 = expanedKey[5],
+            k6 = expanedKey[6], k7 = expanedKey[7],
+            k8 = expanedKey[8];
+            long t0 = expanedTweak[0], t1 = expanedTweak[1],
+            t2 = expanedTweak[2];
 
             b1 += k1; b0 += b1 + k0; b1 = ((b1 << 46) | (b1 >>> (64 - 46))) ^ b0;
             b3 += k3; b2 += b3 + k2; b3 = ((b3 << 36) | (b3 >>> (64 - 36))) ^ b2;
@@ -923,20 +923,20 @@ public class ThreefishCipher implements BlockCipher {
             output[7] = b7 + k7 + 18;
         }
 
-        public void Decrypt(long[] input, long[] output)
+        public void decrypt(long[] input, long[] output)
         {
 
             long b0 = input[0], b1 = input[1],
             b2 = input[2], b3 = input[3],
             b4 = input[4], b5 = input[5],
             b6 = input[6], b7 = input[7];
-            long k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-            k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-            k4 = ExpandedKey[4], k5 = ExpandedKey[5],
-            k6 = ExpandedKey[6], k7 = ExpandedKey[7],
-            k8 = ExpandedKey[8];
-            long t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-            t2 = ExpandedTweak[2];
+            long k0 = expanedKey[0], k1 = expanedKey[1],
+            k2 = expanedKey[2], k3 = expanedKey[3],
+            k4 = expanedKey[4], k5 = expanedKey[5],
+            k6 = expanedKey[6], k7 = expanedKey[7],
+            k8 = expanedKey[8];
+            long t0 = expanedTweak[0], t1 = expanedTweak[1],
+            t2 = expanedTweak[2];
             long tmp;
 
             b0 -= k0;
@@ -1262,11 +1262,11 @@ public class ThreefishCipher implements BlockCipher {
         public Threefish1024()
         {
 
-            ExpandedKey = new long[EXPANDED_KEY_SIZE];
-            ExpandedKey[EXPANDED_KEY_SIZE - 1] = KeyScheduleConst;
+            expanedKey = new long[EXPANDED_KEY_SIZE];
+            expanedKey[EXPANDED_KEY_SIZE - 1] = KEY_SCHEDULE_CONST;
         }
 
-        public void Encrypt(long[] input, long[] output)
+        public void encrypt(long[] input, long[] output)
         {
 
             long b0 = input[0], b1 = input[1],
@@ -1277,17 +1277,17 @@ public class ThreefishCipher implements BlockCipher {
             b10 = input[10], b11 = input[11],
             b12 = input[12], b13 = input[13],
             b14 = input[14], b15 = input[15];
-            long k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-            k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-            k4 = ExpandedKey[4], k5 = ExpandedKey[5],
-            k6 = ExpandedKey[6], k7 = ExpandedKey[7],
-            k8 = ExpandedKey[8], k9 = ExpandedKey[9],
-            k10 = ExpandedKey[10], k11 = ExpandedKey[11],
-            k12 = ExpandedKey[12], k13 = ExpandedKey[13],
-            k14 = ExpandedKey[14], k15 = ExpandedKey[15],
-            k16 = ExpandedKey[16];
-            long t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-            t2 = ExpandedTweak[2];
+            long k0 = expanedKey[0], k1 = expanedKey[1],
+            k2 = expanedKey[2], k3 = expanedKey[3],
+            k4 = expanedKey[4], k5 = expanedKey[5],
+            k6 = expanedKey[6], k7 = expanedKey[7],
+            k8 = expanedKey[8], k9 = expanedKey[9],
+            k10 = expanedKey[10], k11 = expanedKey[11],
+            k12 = expanedKey[12], k13 = expanedKey[13],
+            k14 = expanedKey[14], k15 = expanedKey[15],
+            k16 = expanedKey[16];
+            long t0 = expanedTweak[0], t1 = expanedTweak[1],
+            t2 = expanedTweak[2];
 
 
             b1 += k1; b0 += b1 + k0; b1 = ((b1 << 24) | (b1 >>> (64 - 24))) ^ b0;
@@ -1950,7 +1950,7 @@ public class ThreefishCipher implements BlockCipher {
             output[15] = b15 + k1 + 20;
         }
 
-        public void Decrypt(long[] input, long[] output)
+        public void decrypt(long[] input, long[] output)
         {
 
             long b0 = input[0], b1 = input[1],
@@ -1961,17 +1961,17 @@ public class ThreefishCipher implements BlockCipher {
             b10 = input[10], b11 = input[11],
             b12 = input[12], b13 = input[13],
             b14 = input[14], b15 = input[15];
-            long k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-            k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-            k4 = ExpandedKey[4], k5 = ExpandedKey[5],
-            k6 = ExpandedKey[6], k7 = ExpandedKey[7],
-            k8 = ExpandedKey[8], k9 = ExpandedKey[9],
-            k10 = ExpandedKey[10], k11 = ExpandedKey[11],
-            k12 = ExpandedKey[12], k13 = ExpandedKey[13],
-            k14 = ExpandedKey[14], k15 = ExpandedKey[15],
-            k16 = ExpandedKey[16];
-            long t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-            t2 = ExpandedTweak[2];
+            long k0 = expanedKey[0], k1 = expanedKey[1],
+            k2 = expanedKey[2], k3 = expanedKey[3],
+            k4 = expanedKey[4], k5 = expanedKey[5],
+            k6 = expanedKey[6], k7 = expanedKey[7],
+            k8 = expanedKey[8], k9 = expanedKey[9],
+            k10 = expanedKey[10], k11 = expanedKey[11],
+            k12 = expanedKey[12], k13 = expanedKey[13],
+            k14 = expanedKey[14], k15 = expanedKey[15],
+            k16 = expanedKey[16];
+            long t0 = expanedTweak[0], t1 = expanedTweak[1],
+            t2 = expanedTweak[2];
             long tmp;
 
             b0 -= k3;

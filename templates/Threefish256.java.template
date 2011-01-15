@@ -45,15 +45,15 @@ The same permissions granted.
 
 public class Threefish256 extends ThreefishCipher {
 
-  final int CipherSize = 256;
-  final int CipherQwords = CipherSize / 64;
-  final int ExpandedKeySize = CipherQwords + 1;
+  final int CIPHER_SIZE = 256;
+  final int CIPHER_QWORDS = CIPHER_SIZE / 64;
+  final int EXPANDED_KEY_SIZE = CIPHER_QWORDS + 1;
 
   public Threefish256()
   {
     // Create the expanded key array
-    ExpandedKey = new long[ExpandedKeySize];
-    ExpandedKey[ExpandedKeySize - 1] = KeyScheduleConst;
+    expandedKey = new long[EXPANDED_KEY_SIZE];
+    expandedKey[EXPANDED_KEY_SIZE - 1] = KEY_SCHEDULE_CONST;
   }
 
   public void Encrypt(long[] input, long[] output)
@@ -61,11 +61,11 @@ public class Threefish256 extends ThreefishCipher {
     // Cache the block, key, and tweak
     long b0 = input[0], b1 = input[1],
       b2 = input[2], b3 = input[3];
-    long k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-      k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-      k4 = ExpandedKey[4];
-    long t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-      t2 = ExpandedTweak[2];
+    long k0 = expandedKey[0], k1 = expandedKey[1],
+      k2 = expandedKey[2], k3 = expandedKey[3],
+      k4 = expandedKey[4];
+    long t0 = expandedTweak[0], t1 = expandedTweak[1],
+      t2 = expandedTweak[2];
 
     Mix5( b0,  b1, 14, k0, k1 + t0);
     Mix5( b2,  b3, 16, k2 + t1, k3);
@@ -223,11 +223,11 @@ public class Threefish256 extends ThreefishCipher {
     // Cache the block, key, and tweak
     long b0 = input[0], b1 = input[1],
       b2 = input[2], b3 = input[3];
-    long k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-      k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-      k4 = ExpandedKey[4];
-    long t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-      t2 = ExpandedTweak[2];
+    long k0 = expandedKey[0], k1 = expandedKey[1],
+      k2 = expandedKey[2], k3 = expandedKey[3],
+      k4 = expandedKey[4];
+    long t0 = expandedTweak[0], t1 = expandedTweak[1],
+      t2 = expandedTweak[2];
     long tmp;
 
     b0 -= k3;
