@@ -495,7 +495,7 @@ public class Skein implements ExtendedDigest {
             stateSize = sourceHash.getcipherStateBits();
 
             // Allocate config value
-            ConfigValue = new long[stateSize / 8];
+            ConfigValue = new long[stateSize / 64];
 
             // Set the state size for the configuration
             ConfigString = new long[ConfigValue.length];
