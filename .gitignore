@@ -4,3 +4,5 @@
 bin/
 build/
 UseDoxygen/
+_obj/
+go/pkg
