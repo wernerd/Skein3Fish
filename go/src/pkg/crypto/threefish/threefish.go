@@ -96,7 +96,7 @@ func NewCipher64(key, tweak []uint64) (*Cipher, os.Error) {
 }
 
 // NewCipher creates and returns a Cipher.
-// The key argument should be the Threefish key, 32, 64 or 128 bytes.
+// The key argument should be the request Threefish state size
 func NewCipherSize(size int) (*Cipher, os.Error) {
     c := new(Cipher)
         
@@ -182,7 +182,7 @@ func (c *Cipher) SetKey(key []uint64) {
     c.internal.setKey(key)
 }
 
-// Some helper functions
+// Some helper functions available for all Threefish* implementations
 /**
  * Initialize the tweak data
  */

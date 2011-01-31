@@ -29,10 +29,8 @@ func (c *skeinConfiguration) generateConfiguration() {
     tweak.setFinalBlock(true)
     tweak.setBitsProcessed(32)
 
-    // define a dummy key with all zeros. NewCipher uses it to determine
-    // Threefish state size.
-    dummyKey := make([]uint64, c.stateSize/64)
-    cipher, _ := threefish.NewCipher64(dummyKey, tweak.getTweak())
+    cipher, _ := threefish.NewCipherSize(c.stateSize)
+    cipher.SetTweak(tweak.getTweak())
     cipher.Encrypt64(c.configValue, c.configString)
 
     c.configValue[0] ^= c.configString[0]

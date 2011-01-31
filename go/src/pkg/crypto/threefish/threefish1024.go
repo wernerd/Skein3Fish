@@ -47,7 +47,7 @@ func newThreefish1024_64(key, tweak []uint64) (*threefish1024, os.Error) {
 
     c.expanedKey[EXPANDED_KEY_SIZE_1024 - 1] = KEY_SCHEDULE_CONST
 
-    setKey(key, c.expanedKey[:]);
+    setKey(key, c.expanedKey[:])
     return c, nil
 }
 

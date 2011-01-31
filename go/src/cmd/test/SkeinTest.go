@@ -35,28 +35,34 @@ func checkKATVectors(ks *katScanner) bool {
             continue
         }
         if strings.Contains(string(kr.restOfLine), "MAC") {
+            skein, _ := skein.NewSkeinForMac(kr.stateSize, kr.hashBitLength, 0, kr.macKey)
+            skein.UpdateBits(kr.msg, 0, kr.msgLength)
+            hash := skein.DoFinal()
+
+            if ret := bytes.Compare(hash, kr.result); ret != 0 {
+                fmt.Printf("%d-%d-%d-%s\n", kr.stateSize, kr.hashBitLength, 
+                    kr.msgLength, string(kr.restOfLine))
+                fmt.Printf("Computed mac:\n%s\n", hex.EncodeToString(hash))
+                fmt.Printf("Expected mac:\n%s\n", hex.EncodeToString(kr.result))
+                return false
+            }
             mac++
             continue
         }
-        fmt.Printf("state: %d, length: %d\n", kr.stateSize, kr.hashBitLength)
-        skein := skein.NewSkein(kr.stateSize, kr.hashBitLength)
+        skein, _ := skein.NewSkein(kr.stateSize, kr.hashBitLength)
         skein.UpdateBits(kr.msg, 0, kr.msgLength)
         hash := skein.DoFinal()
         if ret := bytes.Compare(hash, kr.result); ret != 0 {
+            fmt.Printf("%d-%d-%d-%s\n", kr.stateSize, kr.hashBitLength,
+                kr.msgLength, string(kr.restOfLine))
             fmt.Printf("Computed hash:\n%s\n", hex.EncodeToString(hash))
             fmt.Printf("Expected result:\n%s\n", hex.EncodeToString(kr.result))
             return false
         }
-        // Enable the next few line so you can check some results manually
-        // if ((kr.msgLength & 1) == 1) {
-        // System.out.println(kr.stateSize + "-" + kr.hashBitLength + "-"
-        // + kr.msgLength + "-" + kr.restOfLine);
-        // hexdump("Computed hash", hash, hash.length);
-        // hexdump("Expected result", kr.result, kr.result.length);
-        // }
         normal++
     }
-    fmt.Printf("Tree: %d, mac: %d, normal: %d\n", tree, mac, normal)
+    fmt.Printf("(Tree: %d), mac: %d, normal: %d, Skein tests total: %d\n", 
+        tree, mac, normal, mac+normal)
     return true
 }
 
@@ -253,7 +259,7 @@ func (s *katScanner) parseMacKeyHeaderLine(line string , kr *katResult) {
 
     ret, err := fmt.Sscanf(line, "MAC key = %d%s", &kr.macKeyLen, &rest);
 
-    if kr.macKeyLen != 0 && ret > 0 {
+    if ret > 0 {
         kr.macKey = make([]byte, kr.macKeyLen);
     }
     if err != nil && ret <= 0 {
