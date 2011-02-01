@@ -1,3 +1,17 @@
+/*
+This package implements the Skein hash and Skein MAC algorithms as defined
+if the Skein V1.3 specification. Skein is one of the five SHA-3 candidate 
+algorithms that advance to the third (and final) round of the SHA-3
+selection.
+The implementation in this package supports:
+* All three state sizes of Skein and Threefish: 256, 512, and 1024 bits
+* Skein MAC
+* Variable length of hash and MAC - even in numbers of bits
+* Support of the full message length as defined in the Skein paper (2^96 -1 bytes, not just a meager 4 GiB :-) )
+* Tested with the official test vectors that are part of the NIST CD (except Tree hashes)
+
+The implementation does not support tree hashing.
+*/
 package skein
 
 import (
@@ -15,9 +29,20 @@ const (normal = iota
     chainedConfig
     )
 
+const (
+    Skein256 = 256
+    Skein512 = 512
+    Skein1024 = 1024
+    )
+    
 type Skein struct {
+    cipherStateBits,
+    cipherStateBytes,
+    cipherStateWords,
+    outputBytes,
+    hashSize, 
+    bytesFilled int
     config *skeinConfiguration
-    cipherStateBits, cipherStateBytes, cipherStateWords, outputBytes, hashSize, bytesFilled int
     cipher *threefish.Cipher
     ubiParameters *ubiTweak
     inputBuffer []byte
@@ -45,7 +70,7 @@ func (s outputSizeError) String() string {
  *     The output size of the hash in bits. Output size must greater 
  *     than zero.
  */
-func NewSkein (stateSize, outputSize int) (*Skein, os.Error) {
+func New (stateSize, outputSize int) (*Skein, os.Error) {
     if stateSize != 256 && stateSize != 512 && stateSize != 1024 {
         return nil, stateSizeError(stateSize)
     }
@@ -63,7 +88,7 @@ func NewSkein (stateSize, outputSize int) (*Skein, os.Error) {
 }
 
 /**
- * Initializes the Skein hash instance for use with a key (Skein MAC)
+ * Initializes the Skein hash instance for use with a key and tree.
  * 
  * @param stateSize
  *     The internal state size of the hash in bits. Supported values 
@@ -76,7 +101,7 @@ func NewSkein (stateSize, outputSize int) (*Skein, os.Error) {
  * @param key
  *     The key for a message authenication code (MAC)
  */
-func NewSkeinForMac (stateSize, outputSize, treeInfo int, key []byte) (*Skein, os.Error) {
+func NewExtended (stateSize, outputSize, treeInfo int, key []byte) (*Skein, os.Error) {
     if stateSize != 256 && stateSize != 512 && stateSize != 1024 {
         return nil, stateSizeError(stateSize)
     }
@@ -89,7 +114,7 @@ func NewSkeinForMac (stateSize, outputSize, treeInfo int, key []byte) (*Skein, o
     if len(key) > 0 {               // do we have a key?
         s.outputBytes = s.cipherStateBytes;
         s.ubiParameters.startNewBlockType(uint64(Key));
-        s.Update(key, 0, len(key)); // hash the key
+        s.Update(key); // hash the key
         s.finalPad()                // computes new Skein state
     }
     s.outputBytes = (outputSize + 7) / 8;  // re-compute here
@@ -114,7 +139,7 @@ func (s *Skein) setup(stateSize, outputSize int) {
 
     // Figure out which cipher we need based on
     // the state size
-    s.cipher, _ = threefish.NewCipherSize(stateSize)
+    s.cipher, _ = threefish.NewSize(stateSize)
 
     // Allocate buffers
     s.inputBuffer = make([]byte, s.cipherStateBytes)
@@ -186,6 +211,15 @@ func (s *Skein) processBlock(bytes int) {
     }
 }
 
+type statusError int
+func (s statusError) String() string {
+    return "crypto/skein: partial byte only on last data block"
+}
+
+type lengthError int
+func (s lengthError) String() string {
+    return "crypto/skein: length of input buffer does not match bit length: " + strconv.Itoa(int(s))
+}
 /**
  * Update the hash with a message bit string.
  * 
@@ -201,30 +235,32 @@ func (s *Skein) processBlock(bytes int) {
  * @param length
  *     Number of bits to hash.
  */
-func (s *Skein) UpdateBits(array []byte, start, length int) {
+func (s *Skein) UpdateBits(input []byte, length int) os.Error {
         
     if s.ubiParameters.isBitPad() {
-        return
+        return statusError(0)
+        
     }
+    if (length+7)/8 != len(input) {
+        return lengthError(length)
+    }
+    s.Update(input)
+
     // if number of bits is a multiple of bytes - that's easy
     if (length & 0x7) == 0 {
-        s.Update(array, start, length >> 3)
-        return
+        return nil
     }
-    // Fill in bytes in buffer, add one for partial byte
-    s.Update(array, start, (length>>3)+1)
-
     // Mask partial byte and set BitPad flag before doFinal()
     mask := byte(1 << (7 - uint(length & 7)))        // partial byte bit mask
     s.inputBuffer[s.bytesFilled-1] = byte((s.inputBuffer[s.bytesFilled-1] & (0-mask)) | mask)
     s.ubiParameters.setBitPad(true)
+    return nil
 }
 
-func (s *Skein) Update(array []byte, start, length int) {
-    var bytesDone int = 0
+func (s *Skein) Update(input []byte) {
 
     // Fill input buffer
-    for bytesDone < length {
+    for i := 0; i < len(input); i++ {
         // Do a transform if the input buffer is filled
         if s.bytesFilled == s.cipherStateBytes {
             // Copy input buffer to cipher input buffer
@@ -241,8 +277,8 @@ func (s *Skein) Update(array []byte, start, length int) {
             // Reset buffer fill count
             s.bytesFilled = 0
         }
-        s.inputBuffer[s.bytesFilled] = array[start]
-        bytesDone++; s.bytesFilled++; start++
+        s.inputBuffer[s.bytesFilled] = input[i]
+        s.bytesFilled++;
     }
 }
 

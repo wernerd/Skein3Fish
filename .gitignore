@@ -1,6 +1,7 @@
 *~
 *.kdev4
 .kdev*
+_go_.*
 bin/
 build/
 UseDoxygen/

@@ -112,7 +112,7 @@ func basicTest256() bool {
     	binary.LittleEndian.PutUint64(result[i*8:i*8+8], three_256_00_result[i])
     }
     // Create cipher with key and tweak data
-	cipher, _ := threefish.NewCipher(key[:], three_256_00_tweak[:])
+	cipher, _ := threefish.New(key[:], three_256_00_tweak[:])
 	
 	// Encrypt and check
 	cipher.Encrypt(dataOut[:], dataIn[:])
@@ -133,7 +133,7 @@ func basicTest256() bool {
         binary.LittleEndian.PutUint64(result[i*8:i*8+8], three_256_01_result[i])
     }
     // Create cipher with key and tweak data
-    cipher, _ = threefish.NewCipher(key[:], three_256_01_tweak[:])
+    cipher, _ = threefish.New(key[:], three_256_01_tweak[:])
     
     // Encrypt and check
     cipher.Encrypt(dataOut[:], dataIn[:])
@@ -178,7 +178,7 @@ func basicTest512() bool {
         binary.LittleEndian.PutUint64(result[i*8:i*8+8], three_512_00_result[i])
     }
     // Create cipher with key and tweak data
-    cipher, _ := threefish.NewCipher(key[:], three_512_00_tweak[:])
+    cipher, _ := threefish.New(key[:], three_512_00_tweak[:])
     
     // Encrypt and check
     cipher.Encrypt(dataOut[:], dataIn[:])
@@ -199,7 +199,7 @@ func basicTest512() bool {
         binary.LittleEndian.PutUint64(result[i*8:i*8+8], three_512_01_result[i])
     }
     // Create cipher with key and tweak data
-    cipher, _ = threefish.NewCipher(key[:], three_512_01_tweak[:])
+    cipher, _ = threefish.New(key[:], three_512_01_tweak[:])
     
     // Encrypt and check
     cipher.Encrypt(dataOut[:], dataIn[:])
@@ -244,7 +244,7 @@ func basicTest1024() bool {
         binary.LittleEndian.PutUint64(result[i*8:i*8+8], three_1024_00_result[i])
     }
     // Create cipher with key and tweak data
-    cipher, _ := threefish.NewCipher(key[:], three_1024_00_tweak[:])
+    cipher, _ := threefish.New(key[:], three_1024_00_tweak[:])
     
     // Encrypt and check
     cipher.Encrypt(dataOut[:], dataIn[:])
@@ -265,7 +265,7 @@ func basicTest1024() bool {
         binary.LittleEndian.PutUint64(result[i*8:i*8+8], three_1024_01_result[i])
     }
     // Create cipher with key and tweak data
-    cipher, _ = threefish.NewCipher(key[:], three_1024_01_tweak[:])
+    cipher, _ = threefish.New(key[:], three_1024_01_tweak[:])
     
     // Encrypt and check
     cipher.Encrypt(dataOut[:], dataIn[:])

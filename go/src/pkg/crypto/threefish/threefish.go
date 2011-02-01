@@ -56,7 +56,7 @@ func (k KeySizeError) String() string {
 
 // NewCipher creates and returns a Cipher.
 // The key argument should be the Threefish key, 32, 64 or 128 bytes.
-func NewCipher(key []byte, tweak []uint64) (*Cipher, os.Error) {
+func New(key []byte, tweak []uint64) (*Cipher, os.Error) {
     c := new(Cipher)
 
     var err os.Error
@@ -77,7 +77,7 @@ func NewCipher(key []byte, tweak []uint64) (*Cipher, os.Error) {
 
 // NewCipher creates and returns a Cipher.
 // The key argument should be the Threefish key, 4, 8 or 16 uint64
-func NewCipher64(key, tweak []uint64) (*Cipher, os.Error) {
+func New64(key, tweak []uint64) (*Cipher, os.Error) {
     c := new(Cipher)
 
     var err os.Error
@@ -97,7 +97,7 @@ func NewCipher64(key, tweak []uint64) (*Cipher, os.Error) {
 
 // NewCipher creates and returns a Cipher.
 // The key argument should be the request Threefish state size
-func NewCipherSize(size int) (*Cipher, os.Error) {
+func NewSize(size int) (*Cipher, os.Error) {
     c := new(Cipher)
         
     var err os.Error

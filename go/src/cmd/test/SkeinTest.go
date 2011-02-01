@@ -35,8 +35,8 @@ func checkKATVectors(ks *katScanner) bool {
             continue
         }
         if strings.Contains(string(kr.restOfLine), "MAC") {
-            skein, _ := skein.NewSkeinForMac(kr.stateSize, kr.hashBitLength, 0, kr.macKey)
-            skein.UpdateBits(kr.msg, 0, kr.msgLength)
+            skein, _ := skein.NewMac(kr.stateSize, kr.hashBitLength, kr.macKey)
+            skein.UpdateBits(kr.msg, kr.msgLength)
             hash := skein.DoFinal()
 
             if ret := bytes.Compare(hash, kr.result); ret != 0 {
@@ -49,8 +49,8 @@ func checkKATVectors(ks *katScanner) bool {
             mac++
             continue
         }
-        skein, _ := skein.NewSkein(kr.stateSize, kr.hashBitLength)
-        skein.UpdateBits(kr.msg, 0, kr.msgLength)
+        skein, _ := skein.New(kr.stateSize, kr.hashBitLength)
+        skein.UpdateBits(kr.msg, kr.msgLength)
         hash := skein.DoFinal()
         if ret := bytes.Compare(hash, kr.result); ret != 0 {
             fmt.Printf("%d-%d-%d-%s\n", kr.stateSize, kr.hashBitLength,

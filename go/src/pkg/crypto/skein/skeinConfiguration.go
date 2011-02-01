@@ -29,7 +29,7 @@ func (c *skeinConfiguration) generateConfiguration() {
     tweak.setFinalBlock(true)
     tweak.setBitsProcessed(32)
 
-    cipher, _ := threefish.NewCipherSize(c.stateSize)
+    cipher, _ := threefish.NewSize(c.stateSize)
     cipher.SetTweak(tweak.getTweak())
     cipher.Encrypt64(c.configValue, c.configString)
 
@@ -47,7 +47,7 @@ func (c *skeinConfiguration) generateConfigurationState(initialState []uint64) {
     tweak.setFinalBlock(true)
     tweak.setBitsProcessed(32)
 
-    cipher, _ := threefish.NewCipher64(initialState, tweak.getTweak())
+    cipher, _ := threefish.New64(initialState, tweak.getTweak())
     cipher.Encrypt64(c.configValue, c.configString)
 
     c.configValue[0] ^= c.configString[0]
