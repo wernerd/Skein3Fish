@@ -5,11 +5,11 @@ algorithms that advance to the third (and final) round of the SHA-3
 selection.
 
 The implementation in this package supports:
-* All three state sizes of Skein and Threefish: 256, 512, and 1024 bits
-* Skein MAC
-* Variable length of hash and MAC input and output - even in numbers of bits
-* Full message length as defined in the Skein paper (2^96 -1 bytes, not just a meager 4 GiB :-) )
-* Tested with the official test vectors that are part of the NIST CD (except Tree hashes)
+	- All three state sizes of Skein and Threefish: 256, 512, and 1024 bits
+	- Skein MAC
+	- Variable length of hash and MAC input and output - even in numbers of bits
+	- Full message length as defined in the Skein paper (2^96 -1 bytes, not just a meager 4 GiB :-) )
+	- Tested with the official test vectors that are part of the NIST CD (except Tree hashes)
 
 The implementation does not support tree hashing.
 */

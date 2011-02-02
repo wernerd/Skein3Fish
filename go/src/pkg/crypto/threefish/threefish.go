@@ -1,3 +1,9 @@
+// This package implement the Threefish cipher as specified in the Skein V1.3
+// specification. The Skein digest algorithm uses Threefish to generate
+// the digests.
+//
+// NOTE: Threefish is a new cipher algorithm  - use with care until fully analysed.
+//
 package threefish
 
 import (
@@ -6,11 +12,16 @@ import (
 	"encoding/binary"
 )
 
-const KEY_SCHEDULE_CONST = uint64(0x1BD11BDAA9FC1A22)
-const EXPANDED_TWEAK_SIZE = 3;
+// General Threefish constants
+//
+const (
+    KEY_SCHEDULE_CONST = uint64(0x1BD11BDAA9FC1A22)
+    EXPANDED_TWEAK_SIZE = 3
+)
 
 
 // Internal interface to simplify Threefish usage
+//
 type cipherInternal interface {
     // Encrypt function
     // 
@@ -41,6 +52,7 @@ type cipherInternal interface {
 
 
 // A Cipher is an instance of Threefish using a particular key and state size.
+//
 type Cipher struct {
 	stateSize int
 	cipherInternal
@@ -53,8 +65,11 @@ func (k KeySizeError) String() string {
 }
 
 // NewCipher creates and returns a Cipher.
-// The key argument should be the Threefish key, 32, 64 or 128 bytes.
-// The blocksize and the Threefish state size is the same as the key length.
+//
+// The key length can be 32, 64 or 128 bytes and must match the Threefish
+// state size. The blocksize is the same as the key length (state size).
+// The tweak is a uint64 array with two elements.
+//
 func New(key []byte, tweak []uint64) (*Cipher, os.Error) {
     var err os.Error
     var internal cipherInternal
@@ -73,8 +88,11 @@ func New(key []byte, tweak []uint64) (*Cipher, os.Error) {
 }
 
 // New64 creates and returns a Cipher.
-// The key argument should be the Threefish key, 4, 8 or 16 uint64
-// The blocksize and the Threefish state size in bytes is: len(key) * sizeof(uint64)
+//
+// The key is a uint64 array of 4, 8 or 16 elements. The key length must match the
+// Threefish state size. The blocksize is the same as the key length (state size).
+// The tweak is a uint64 array with two elements.
+//
 func New64(key, tweak []uint64) (*Cipher, os.Error) {
     var err os.Error
     var internal cipherInternal
@@ -93,8 +111,10 @@ func New64(key, tweak []uint64) (*Cipher, os.Error) {
 }
 
 // NewSize creates and returns a Cipher.
-// The key argument should be the requested Threefish state size
-// which is also the key and block size
+//
+// The size argument is the requested Threefish state size
+// which is also the key and block size. Supported sizes see constants section.
+//
 func NewSize(size int) (*Cipher, os.Error) {
     var err os.Error
     var internal cipherInternal
@@ -113,12 +133,14 @@ func NewSize(size int) (*Cipher, os.Error) {
 }
 
 // BlockSize returns the cipher's block size in bytes.
+//
 func (c *Cipher) BlockSize() int {
     return c.stateSize / 8
 }
 
 // Encrypt encrypts the first block in src into dst.
 // Dst and src may point at the same memory.
+//
 func (c *Cipher) Encrypt(dst, src []byte) {
 
     uintLen := c.stateSize / 64
@@ -138,6 +160,7 @@ func (c *Cipher) Encrypt(dst, src []byte) {
 
 // Decrypt decrypts the first block in src into dst.
 // Dst and src may point at the same memory.
+//
 func (c *Cipher) Decrypt(dst, src []byte) {
 
     uintLen := c.stateSize / 64
@@ -156,31 +179,38 @@ func (c *Cipher) Decrypt(dst, src []byte) {
 }
 
 // Encrypt encrypts the first block in src into dst, blocks
-// are unit64 arrays
+// are unit64 arrays.
 // Dst and src may point at the same memory.
+//
 func (c *Cipher) Encrypt64(dst, src []uint64) {
     c.encrypt(src, dst)
 }
 
 // Decrypt encrypts the first block in src into dst, blocks
-// are unit64 arrays
+// are unit64 arrays.
 // Dst and src may point at the same memory.
+//
 func (c *Cipher) Decrypt64(dst, src []uint64) {
     c.decrypt(src, dst)
 }
 
+// Set the tweak data.
+//
+// The tweak is a uint64 array with two elements.
+//
 func (c *Cipher) SetTweak(tweak []uint64) {
     c.setTweak(tweak)
 }
 
+// Set the key.
+//
+// The key must have the same length as the Threefish state size.
+// 
 func (c *Cipher) SetKey(key []uint64) {
     c.setKey(key)
 }
 
 // Some helper functions available for all Threefish* implementations
-/**
- * Initialize the tweak data
- */
 func setTweak(tweak, expTweak []uint64) {
     if tweak != nil {
         expTweak[0] = tweak[0]
@@ -189,9 +219,6 @@ func setTweak(tweak, expTweak []uint64) {
     }
 }
 
-/**
- * Expand the key data
- */
 func setKey(key, expKey []uint64) {
     var i int
     parity := uint64(KEY_SCHEDULE_CONST)

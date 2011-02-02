@@ -5,12 +5,13 @@ import (
     "encoding/binary"
 )
 
-/*
- * Threefish 256 implementation
- */
-const CIPHER_SIZE_256 = 256
-const CIPHER_QWORDS_256 = CIPHER_SIZE_256 / 64
-const EXPANDED_KEY_SIZE_256 = CIPHER_QWORDS_256 + 1
+// Constants for Threefish 256 implementation
+//
+const (
+    CIPHER_SIZE_256 = 256
+    CIPHER_QWORDS_256 = CIPHER_SIZE_256 / 64
+    EXPANDED_KEY_SIZE_256 = CIPHER_QWORDS_256 + 1
+)
 
 type threefish256 struct {
     expanedTweak [EXPANDED_TWEAK_SIZE]uint64

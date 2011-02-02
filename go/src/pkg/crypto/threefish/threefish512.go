@@ -5,12 +5,13 @@ import (
     "encoding/binary"
 )
 
-/*
- * Threefish 512 implementation
- */
-const CIPHER_SIZE_512 = 512
-const CIPHER_QWORDS_512 = CIPHER_SIZE_512 / 64
-const EXPANDED_KEY_SIZE_512 = CIPHER_QWORDS_512 + 1
+// Constants for Threefish 512 implementation
+//
+const (
+    CIPHER_SIZE_512 = 512
+    CIPHER_QWORDS_512 = CIPHER_SIZE_512 / 64
+    EXPANDED_KEY_SIZE_512 = CIPHER_QWORDS_512 + 1
+)
 
 type threefish512 struct {
     expanedTweak [EXPANDED_TWEAK_SIZE]uint64
