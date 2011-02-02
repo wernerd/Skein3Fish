@@ -5,7 +5,7 @@ import (
     )
     
 type skeinConfiguration struct {
-    stateSize int
+    numStateWords int
     configValue []uint64
     // Set the state size for the configuration
     configString []uint64
@@ -13,9 +13,9 @@ type skeinConfiguration struct {
 
 func newSkeinConfiguration(sk *Skein) *skeinConfiguration {
     s := new(skeinConfiguration)
-    s.stateSize = sk.getcipherStateBits()
-    s.configValue = make([]uint64, s.stateSize / 64)
-    s.configString = make([]uint64, s.stateSize / 64)
+    s.numStateWords = sk.getNumberCipherStateWords()
+    s.configValue = make([]uint64, s.numStateWords )
+    s.configString = make([]uint64, s.numStateWords)
     s.configString[1] = uint64(sk.getHashSize())
     return s
 }
@@ -29,7 +29,7 @@ func (c *skeinConfiguration) generateConfiguration() {
     tweak.setFinalBlock(true)
     tweak.setBitsProcessed(32)
 
-    cipher, _ := threefish.NewSize(c.stateSize)
+    cipher, _ := threefish.NewSize(c.numStateWords*64)
     cipher.SetTweak(tweak.getTweak())
     cipher.Encrypt64(c.configValue, c.configString)
 

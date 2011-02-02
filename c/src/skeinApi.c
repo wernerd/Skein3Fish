@@ -133,10 +133,6 @@ void skeinReset(SkeinCtx_t* ctx)
      */
     X = ctx->m.s256.X;
     Xlen = ctx->skeinSize/8;
-    /*
-     * If size is the same and hash bit length is zero then reuse
-     * the save chaining variables.
-     */
     /* Restore the chaing variable, reset byte counter */
     memcpy(X, ctx->XSave, Xlen);
 

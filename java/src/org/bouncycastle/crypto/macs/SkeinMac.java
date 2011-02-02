@@ -54,7 +54,7 @@ public class SkeinMac implements Mac {
     }
 
     public String getAlgorithmName() {
-        return skein.getAlgorithmName() + "/HMAC";
+        return skein.getAlgorithmName() + "/MAC";
     }
 
     public int getMacSize() {

@@ -38,11 +38,21 @@ func checkKATVectors(ks *katScanner) bool {
             skein, _ := skein.NewMac(kr.stateSize, kr.hashBitLength, kr.macKey)
             skein.UpdateBits(kr.msg, kr.msgLength)
             hash := skein.DoFinal()
-
             if ret := bytes.Compare(hash, kr.result); ret != 0 {
                 fmt.Printf("%d-%d-%d-%s\n", kr.stateSize, kr.hashBitLength, 
                     kr.msgLength, string(kr.restOfLine))
                 fmt.Printf("Computed mac:\n%s\n", hex.EncodeToString(hash))
+                fmt.Printf("Expected mac:\n%s\n", hex.EncodeToString(kr.result))
+                return false
+            }
+            // do it second time with same instance to check if context was 
+            // reset correctly
+            skein.UpdateBits(kr.msg, kr.msgLength)
+            hash = skein.DoFinal()
+            if ret := bytes.Compare(hash, kr.result); ret != 0 {
+                fmt.Printf("%d-%d-%d-%s\n", kr.stateSize, kr.hashBitLength, 
+                    kr.msgLength, string(kr.restOfLine))
+                fmt.Printf("Computed mac after reset:\n%s\n", hex.EncodeToString(hash))
                 fmt.Printf("Expected mac:\n%s\n", hex.EncodeToString(kr.result))
                 return false
             }
@@ -56,6 +66,17 @@ func checkKATVectors(ks *katScanner) bool {
             fmt.Printf("%d-%d-%d-%s\n", kr.stateSize, kr.hashBitLength,
                 kr.msgLength, string(kr.restOfLine))
             fmt.Printf("Computed hash:\n%s\n", hex.EncodeToString(hash))
+            fmt.Printf("Expected result:\n%s\n", hex.EncodeToString(kr.result))
+            return false
+        }
+        // do it second time with same instance to check if context was reset
+        // correctly
+        skein.UpdateBits(kr.msg, kr.msgLength)
+        hash = skein.DoFinal()
+        if ret := bytes.Compare(hash, kr.result); ret != 0 {
+            fmt.Printf("%d-%d-%d-%s\n", kr.stateSize, kr.hashBitLength,
+                kr.msgLength, string(kr.restOfLine))
+            fmt.Printf("Computed hash after reset:\n%s\n", hex.EncodeToString(hash))
             fmt.Printf("Expected result:\n%s\n", hex.EncodeToString(kr.result))
             return false
         }

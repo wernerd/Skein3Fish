@@ -139,7 +139,7 @@ extern "C"
      * @param ctx
      *     Pointer to a Skein context.
      * @param hashBitLen
-     *     Number of MAC hash bits to compute or zero
+     *     Number of MAC hash bits to compute
      * @return
      *     SKEIN_SUCESS of SKEIN_FAIL
      * @see skeinReset
@@ -147,7 +147,7 @@ extern "C"
     int skeinInit(SkeinCtx_t* ctx, size_t hashBitLen);
 
     /**
-     * Resets a Skein context for furter use.
+     * Resets a Skein context for further use.
      * 
      * Restores the saved chaining variables to reset the Skein context. 
      * Thus applications can reuse the same setup to  process several 
@@ -159,7 +159,7 @@ extern "C"
     void skeinReset(SkeinCtx_t* ctx);
     
     /**
-     * Initializes or reuses a Skein context for MAC usage.
+     * Initializes a Skein context for MAC usage.
      * 
      * Initializes the context with this data and saves the resulting Skein 
      * state variables for further use.
@@ -174,7 +174,7 @@ extern "C"
      * @param keyLen
      *     Length of the key in bytes or zero
      * @param hashBitLen
-     *     Number of MAC hash bits to compute or zero
+     *     Number of MAC hash bits to compute
      * @return
      *     SKEIN_SUCESS of SKEIN_FAIL
      */
@@ -216,8 +216,7 @@ extern "C"
      * Finalize Skein and return the hash.
      * 
      * Before an application can reuse a Skein setup the application must
-     * reinitialize the Skein context.See the approriate initialization 
-     * methods how to achieve this.
+     * reset the Skein context.
      *
      * @param ctx
      *     Pointer to initialized Skein context
@@ -226,8 +225,7 @@ extern "C"
      *     enough to store @c hashBitLen bits.
      * @return
      *     Success or error code.
-     * @see skeinInit
-     * @see skeinMacInit
+     * @see skeinReset
      */
     int skeinFinal(SkeinCtx_t* ctx, uint8_t* hash);
 
