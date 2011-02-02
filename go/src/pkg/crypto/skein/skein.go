@@ -329,7 +329,7 @@ func (s *Skein) DoFinal() (hash []byte) {
         if outputSize > stateBytes {
             outputSize = stateBytes
         }
-        s.putBytes(s.state, hash[i:], outputSize)
+        s.putBytes(s.state, hash[i : i+outputSize])
         // Restore old state
         copy(s.state, oldState)
         // Increment counter
@@ -381,9 +381,9 @@ func (s *Skein) finalPad(){
 // byteCount
 //     The number of bytes to disassemble, arbitrary length.
 //
-func (s *Skein) putBytes(input []uint64, output []byte, byteCount int) {
+func (s *Skein) putBytes(input []uint64, output []byte) {
     var j uint
-    for i := 0; i < byteCount; i++ {
+    for i := 0; i < len(output); i++ {
         output[i] = byte(input[i/8] >> j)
         j = (j + 8) & 63
     }
