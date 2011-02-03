@@ -1,0 +1,406 @@
+/*
+Copyright (c) 2010 Alberto Fajardo
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+The tweaks and modifications for Java:
+Copyright (c) 2010, Werner Dittmann. 
+
+The same permissions granted.
+*/
+
+/*
+ * Use the following commad (on Linux for example) to generate the real
+ * Java class:
+ *    gcc -E - < Threefish256.java.template | sed -e '/^#/d' > Threefish256.java
+ *
+ * Then replace the class code in org/bouncycastle/crypto/engines/ThreefishCipher
+ * with the newly generated class code.
+ * 
+ * The mix.h contains Mix and UnMix macros that replace the Mix/UnMix calls
+ * below with the real code. This produces unrolled loops. This technique
+ * saves a lot of error prone editing.
+ * sed just removes some lines that gcc -E inserted.
+ */
+#include "mix.h"
+#include "shifter.h"
+
+public class Threefish256 extends ThreefishCipher {
+
+  final int CIPHER_SIZE = 256;
+  final int CIPHER_QWORDS = CIPHER_SIZE / 64;
+  final int EXPANDED_KEY_SIZE = CIPHER_QWORDS + 1;
+
+  public Threefish256()
+  {
+    // Create the expanded key array
+    expandedKey = new long[EXPANDED_KEY_SIZE];
+    expandedKey[EXPANDED_KEY_SIZE - 1] = KEY_SCHEDULE_CONST;
+  }
+
+  public void Encrypt(long[] input, long[] output)
+  {
+    // Cache the block, key, and tweak
+    long b0 = input[0], b1 = input[1],
+      b2 = input[2], b3 = input[3];
+    long k0 = expandedKey[0], k1 = expandedKey[1],
+      k2 = expandedKey[2], k3 = expandedKey[3],
+      k4 = expandedKey[4];
+    long t0 = expandedTweak[0], t1 = expandedTweak[1],
+      t2 = expandedTweak[2];
+
+    Mix5( b0,  b1, R_256_0_0, k0, k1 + t0);		// R0
+    Mix5( b2,  b3, R_256_0_1, k2 + t1, k3);
+    Mix( b0,  b3, R_256_1_0);				// R1
+    Mix( b2,  b1, R_256_1_1);
+    Mix( b0,  b1, R_256_2_0);				// R2
+    Mix( b2,  b3, R_256_2_1);
+    Mix( b0,  b3, R_256_3_0);				// R3
+    Mix( b2,  b1, R_256_3_1);
+    Mix5( b0,  b1, R_256_4_0, k1, k2 + t1);		// R4
+    Mix5( b2,  b3, R_256_4_1, k3 + t2, k4 + 1);
+    Mix( b0,  b3, R_256_5_0);				// R5
+    Mix( b2,  b1, R_256_5_1);
+    Mix( b0,  b1, R_256_6_0);				// R6
+    Mix( b2,  b3, R_256_6_1);
+    Mix( b0,  b3, R_256_7_0);				// R7
+    Mix( b2,  b1, R_256_7_1);
+
+    Mix5( b0,  b1, R_256_0_0, k2, k3 + t2);		// R8
+    Mix5( b2,  b3, R_256_0_1, k4 + t0, k0 + 2);
+    Mix( b0,  b3, R_256_1_0);				// R9
+    Mix( b2,  b1, R_256_1_1);
+    Mix( b0,  b1, R_256_2_0);				// R10
+    Mix( b2,  b3, R_256_2_1);
+    Mix( b0,  b3, R_256_3_0);				// R1
+    Mix( b2,  b1, R_256_3_1);
+    Mix5( b0,  b1, R_256_4_0, k3, k4 + t0);		// R12
+    Mix5( b2,  b3, R_256_4_1, k0 + t1, k1 + 3);
+    Mix( b0,  b3, R_256_5_0);				// R13
+    Mix( b2,  b1, R_256_5_1);
+    Mix( b0,  b1, R_256_6_0);				// R14
+    Mix( b2,  b3, R_256_6_1);
+    Mix( b0,  b3, R_256_7_0);				// R15
+    Mix( b2,  b1, R_256_7_1);
+
+    Mix5( b0,  b1, R_256_0_0, k4, k0 + t1);		// R16
+    Mix5( b2,  b3, R_256_0_1, k1 + t2, k2 + 4);
+    Mix( b0,  b3, R_256_1_0);				// R17
+    Mix( b2,  b1, R_256_1_1);
+    Mix( b0,  b1, R_256_2_0);				// R18
+    Mix( b2,  b3, R_256_2_1);
+    Mix( b0,  b3, R_256_3_0);				// R19
+    Mix( b2,  b1, R_256_3_1);
+    Mix5( b0,  b1, R_256_4_0, k0, k1 + t2);		// R20
+    Mix5( b2,  b3, R_256_4_1, k2 + t0, k3 + 5);
+    Mix( b0,  b3, R_256_5_0);				// R21
+    Mix( b2,  b1, R_256_5_1);
+    Mix( b0,  b1, R_256_6_0);				// R22
+    Mix( b2,  b3, R_256_6_1);
+    Mix( b0,  b3, R_256_7_0);				// R23
+    Mix( b2,  b1, R_256_7_1);
+
+    Mix5( b0,  b1, R_256_0_0, k1, k2 + t0);		// R24
+    Mix5( b2,  b3, R_256_0_1, k3 + t1, k4 + 6);
+    Mix( b0,  b3, R_256_1_0);				// R25
+    Mix( b2,  b1, R_256_1_1);
+    Mix( b0,  b1, R_256_2_0);				// R26
+    Mix( b2,  b3, R_256_2_1);
+    Mix( b0,  b3, R_256_3_0);				// R27
+    Mix( b2,  b1, R_256_3_1);
+    Mix5( b0,  b1, R_256_4_0, k2, k3 + t1);		// R28
+    Mix5( b2,  b3, R_256_4_1, k4 + t2, k0 + 7);
+    Mix( b0,  b3, R_256_5_0);				// R29
+    Mix( b2,  b1, R_256_5_1);
+    Mix( b0,  b1, R_256_6_0);				// R30
+    Mix( b2,  b3, R_256_6_1);
+    Mix( b0,  b3, R_256_7_0);				// R31
+    Mix( b2,  b1, R_256_7_1);
+
+    Mix5( b0,  b1, R_256_0_0, k3, k4 + t2);		// R32
+    Mix5( b2,  b3, R_256_0_1, k0 + t0, k1 + 8);
+    Mix( b0,  b3, R_256_1_0);				// R33
+    Mix( b2,  b1, R_256_1_1);
+    Mix( b0,  b1, R_256_2_0);				// R34
+    Mix( b2,  b3, R_256_2_1);
+    Mix( b0,  b3, R_256_3_0);				// R35
+    Mix( b2,  b1, R_256_3_1);
+    Mix5( b0,  b1, R_256_4_0, k4, k0 + t0);		// R36
+    Mix5( b2,  b3, R_256_4_1, k1 + t1, k2 + 9);
+    Mix( b0,  b3, R_256_5_0);				// R37
+    Mix( b2,  b1, R_256_5_1);
+    Mix( b0,  b1, R_256_6_0);				// R38
+    Mix( b2,  b3, R_256_6_1);
+    Mix( b0,  b3, R_256_7_0);				// R39
+    Mix( b2,  b1, R_256_7_1);
+
+    Mix5( b0,  b1, R_256_0_0, k0, k1 + t1);		// R40
+    Mix5( b2,  b3, R_256_0_1, k2 + t2, k3 + 10);
+    Mix( b0,  b3, R_256_1_0);				// R41
+    Mix( b2,  b1, R_256_1_1);
+    Mix( b0,  b1, R_256_2_0);				// R42
+    Mix( b2,  b3, R_256_2_1);
+    Mix( b0,  b3, R_256_3_0);				// R43
+    Mix( b2,  b1, R_256_3_1);
+    Mix5( b0,  b1, R_256_4_0, k1, k2 + t2);		// R44
+    Mix5( b2,  b3, R_256_4_1, k3 + t0, k4 + 11);
+    Mix( b0,  b3, R_256_5_0);				// R45
+    Mix( b2,  b1, R_256_5_1);
+    Mix( b0,  b1, R_256_6_0);				// R46
+    Mix( b2,  b3, R_256_6_1);
+    Mix( b0,  b3, R_256_7_0);				// R47
+    Mix( b2,  b1, R_256_7_1);
+
+    Mix5( b0,  b1, R_256_0_0, k2, k3 + t0);		// R48
+    Mix5( b2,  b3, R_256_0_1, k4 + t1, k0 + 12);
+    Mix( b0,  b3, R_256_1_0);				// R49
+    Mix( b2,  b1, R_256_1_1);
+    Mix( b0,  b1, R_256_2_0);				// R50
+    Mix( b2,  b3, R_256_2_1);
+    Mix( b0,  b3, R_256_3_0);				// R51
+    Mix( b2,  b1, R_256_3_1);
+    Mix5( b0,  b1, R_256_4_0, k3, k4 + t1);		// R52
+    Mix5( b2,  b3, R_256_4_1, k0 + t2, k1 + 13);
+    Mix( b0,  b3, R_256_5_0);				// R53
+    Mix( b2,  b1, R_256_5_1);
+    Mix( b0,  b1, R_256_6_0);				// R54
+    Mix( b2,  b3, R_256_6_1);
+    Mix( b0,  b3, R_256_7_0);				// R55
+    Mix( b2,  b1, R_256_7_1);
+
+    Mix5( b0,  b1, R_256_0_0, k4, k0 + t2);		// R56
+    Mix5( b2,  b3, R_256_0_1, k1 + t0, k2 + 14);
+    Mix( b0,  b3, R_256_1_0);				// R57
+    Mix( b2,  b1, R_256_1_1);
+    Mix( b0,  b1, R_256_2_0);				// R58
+    Mix( b2,  b3, R_256_2_1);
+    Mix( b0,  b3, R_256_3_0);				// R59
+    Mix( b2,  b1, R_256_3_1);
+    Mix5( b0,  b1, R_256_4_0, k0, k1 + t0);		// R60
+    Mix5( b2,  b3, R_256_4_1, k2 + t1, k3 + 15);
+    Mix( b0,  b3, R_256_5_0);				// R61
+    Mix( b2,  b1, R_256_5_1);
+    Mix( b0,  b1, R_256_6_0);				// R62
+    Mix( b2,  b3, R_256_6_1);
+    Mix( b0,  b3, R_256_7_0);				// R63
+    Mix( b2,  b1, R_256_7_1);
+
+    Mix5( b0,  b1, R_256_0_0, k1, k2 + t1);		// R64
+    Mix5( b2,  b3, R_256_0_1, k3 + t2, k4 + 16);
+    Mix( b0,  b3, R_256_1_0);				// R65
+    Mix( b2,  b1, R_256_1_1);
+    Mix( b0,  b1, R_256_2_0);				// R66
+    Mix( b2,  b3, R_256_2_1);
+    Mix( b0,  b3, R_256_3_0);				// R67
+    Mix( b2,  b1, R_256_3_1);
+    Mix5( b0,  b1, R_256_4_0, k2, k3 + t2);		// R68
+    Mix5( b2,  b3, R_256_4_1, k4 + t0, k0 + 17);
+    Mix( b0,  b3, R_256_5_0);				// R69
+    Mix( b2,  b1, R_256_5_1);
+    Mix( b0,  b1, R_256_6_0);				// R70
+    Mix( b2,  b3, R_256_6_1);
+    Mix( b0,  b3, R_256_7_0);				// R71
+    Mix( b2,  b1, R_256_7_1);
+
+    output[0] = b0 + k3;
+    output[1] = b1 + k4 + t0;
+    output[2] = b2 + k0 + t1;
+    output[3] = b3 + k1 + 18;
+  }
+
+  public void Decrypt(long[] input, long[] output)
+  {
+    // Cache the block, key, and tweak
+    long b0 = input[0], b1 = input[1],
+      b2 = input[2], b3 = input[3];
+    long k0 = expandedKey[0], k1 = expandedKey[1],
+      k2 = expandedKey[2], k3 = expandedKey[3],
+      k4 = expandedKey[4];
+    long t0 = expandedTweak[0], t1 = expandedTweak[1],
+      t2 = expandedTweak[2];
+    long tmp;
+
+    b0 -= k3;
+    b1 -= k4 + t0;
+    b2 -= k0 + t1;
+    b3 -= k1 + 18;
+
+    UnMix( b0,  b3, R_256_7_0);
+    UnMix( b2,  b1, R_256_7_1);
+    UnMix( b0,  b1, R_256_6_0);
+    UnMix( b2,  b3, R_256_6_1);
+    UnMix( b0,  b3, R_256_5_0);
+    UnMix( b2,  b1, R_256_5_1);
+    UnMix5( b0,  b1, R_256_4_0, k2, k3 + t2);
+    UnMix5( b2,  b3, R_256_4_1, k4 + t0, k0 + 17);
+    UnMix( b0,  b3, R_256_3_0);
+    UnMix( b2,  b1, R_256_3_1);
+    UnMix( b0,  b1, R_256_2_0);
+    UnMix( b2,  b3, R_256_2_1);
+    UnMix( b0,  b3, R_256_1_0);
+    UnMix( b2,  b1, R_256_1_1);
+    UnMix5( b0,  b1, R_256_0_0, k1, k2 + t1);
+    UnMix5( b2,  b3, R_256_0_1, k3 + t2, k4 + 16);
+
+    UnMix( b0,  b3, R_256_7_0);
+    UnMix( b2,  b1, R_256_7_1);
+    UnMix( b0,  b1, R_256_6_0);
+    UnMix( b2,  b3, R_256_6_1);
+    UnMix( b0,  b3, R_256_5_0);
+    UnMix( b2,  b1, R_256_5_1);
+    UnMix5( b0,  b1, R_256_4_0, k0, k1 + t0);
+    UnMix5( b2,  b3, R_256_4_1, k2 + t1, k3 + 15);
+    UnMix( b0,  b3, R_256_3_0);
+    UnMix( b2,  b1, R_256_3_1);
+    UnMix( b0,  b1, R_256_2_0);
+    UnMix( b2,  b3, R_256_2_1);
+    UnMix( b0,  b3, R_256_1_0);
+    UnMix( b2,  b1, R_256_1_1);
+    UnMix5( b0,  b1, R_256_0_0, k4, k0 + t2);
+    UnMix5( b2,  b3, R_256_0_1, k1 + t0, k2 + 14);
+
+    UnMix( b0,  b3, R_256_7_0);
+    UnMix( b2,  b1, R_256_7_1);
+    UnMix( b0,  b1, R_256_6_0);
+    UnMix( b2,  b3, R_256_6_1);
+    UnMix( b0,  b3, R_256_5_0);
+    UnMix( b2,  b1, R_256_5_1);
+    UnMix5( b0,  b1, R_256_4_0, k3, k4 + t1);
+    UnMix5( b2,  b3, R_256_4_1, k0 + t2, k1 + 13);
+    UnMix( b0,  b3, R_256_3_0);
+    UnMix( b2,  b1, R_256_3_1);
+    UnMix( b0,  b1, R_256_2_0);
+    UnMix( b2,  b3, R_256_2_1);
+    UnMix( b0,  b3, R_256_1_0);
+    UnMix( b2,  b1, R_256_1_1);
+    UnMix5( b0,  b1, R_256_0_0, k2, k3 + t0);
+    UnMix5( b2,  b3, R_256_0_1, k4 + t1, k0 + 12);
+
+    UnMix( b0,  b3, R_256_7_0);
+    UnMix( b2,  b1, R_256_7_1);
+    UnMix( b0,  b1, R_256_6_0);
+    UnMix( b2,  b3, R_256_6_1);
+    UnMix( b0,  b3, R_256_5_0);
+    UnMix( b2,  b1, R_256_5_1);
+    UnMix5( b0,  b1, R_256_4_0, k1, k2 + t2);
+    UnMix5( b2,  b3, R_256_4_1, k3 + t0, k4 + 11);
+    UnMix( b0,  b3, R_256_3_0);
+    UnMix( b2,  b1, R_256_3_1);
+    UnMix( b0,  b1, R_256_2_0);
+    UnMix( b2,  b3, R_256_2_1);
+    UnMix( b0,  b3, R_256_1_0);
+    UnMix( b2,  b1, R_256_1_1);
+    UnMix5( b0,  b1, R_256_0_0, k0, k1 + t1);
+    UnMix5( b2,  b3, R_256_0_1, k2 + t2, k3 + 10);
+
+    UnMix( b0,  b3, R_256_7_0);
+    UnMix( b2,  b1, R_256_7_1);
+    UnMix( b0,  b1, R_256_6_0);
+    UnMix( b2,  b3, R_256_6_1);
+    UnMix( b0,  b3, R_256_5_0);
+    UnMix( b2,  b1, R_256_5_1);
+    UnMix5( b0,  b1, R_256_4_0, k4, k0 + t0);
+    UnMix5( b2,  b3, R_256_4_1, k1 + t1, k2 + 9);
+    UnMix( b0,  b3, R_256_3_0);
+    UnMix( b2,  b1, R_256_3_1);
+    UnMix( b0,  b1, R_256_2_0);
+    UnMix( b2,  b3, R_256_2_1);
+    UnMix( b0,  b3, R_256_1_0);
+    UnMix( b2,  b1, R_256_1_1);
+    UnMix5( b0,  b1, R_256_0_0, k3, k4 + t2);
+    UnMix5( b2,  b3, R_256_0_1, k0 + t0, k1 + 8);
+
+    UnMix( b0,  b3, R_256_7_0);
+    UnMix( b2,  b1, R_256_7_1);
+    UnMix( b0,  b1, R_256_6_0);
+    UnMix( b2,  b3, R_256_6_1);
+    UnMix( b0,  b3, R_256_5_0);
+    UnMix( b2,  b1, R_256_5_1);
+    UnMix5( b0,  b1, R_256_4_0, k2, k3 + t1);
+    UnMix5( b2,  b3, R_256_4_1, k4 + t2, k0 + 7);
+    UnMix( b0,  b3, R_256_3_0);
+    UnMix( b2,  b1, R_256_3_1);
+    UnMix( b0,  b1, R_256_2_0);
+    UnMix( b2,  b3, R_256_2_1);
+    UnMix( b0,  b3, R_256_1_0);
+    UnMix( b2,  b1, R_256_1_1);
+    UnMix5( b0,  b1, R_256_0_0, k1, k2 + t0);
+    UnMix5( b2,  b3, R_256_0_1, k3 + t1, k4 + 6);
+
+    UnMix( b0,  b3, R_256_7_0);
+    UnMix( b2,  b1, R_256_7_1);
+    UnMix( b0,  b1, R_256_6_0);
+    UnMix( b2,  b3, R_256_6_1);
+    UnMix( b0,  b3, R_256_5_0);
+    UnMix( b2,  b1, R_256_5_1);
+    UnMix5( b0,  b1, R_256_4_0, k0, k1 + t2);
+    UnMix5( b2,  b3, R_256_4_1, k2 + t0, k3 + 5);
+    UnMix( b0,  b3, R_256_3_0);
+    UnMix( b2,  b1, R_256_3_1);
+    UnMix( b0,  b1, R_256_2_0);
+    UnMix( b2,  b3, R_256_2_1);
+    UnMix( b0,  b3, R_256_1_0);
+    UnMix( b2,  b1, R_256_1_1);
+    UnMix5( b0,  b1, R_256_0_0, k4, k0 + t1);
+    UnMix5( b2,  b3, R_256_0_1, k1 + t2, k2 + 4);
+
+    UnMix( b0,  b3, R_256_7_0);
+    UnMix( b2,  b1, R_256_7_1);
+    UnMix( b0,  b1, R_256_6_0);
+    UnMix( b2,  b3, R_256_6_1);
+    UnMix( b0,  b3, R_256_5_0);
+    UnMix( b2,  b1, R_256_5_1);
+    UnMix5( b0,  b1, R_256_4_0, k3, k4 + t0);
+    UnMix5( b2,  b3, R_256_4_1, k0 + t1, k1 + 3);
+    UnMix( b0,  b3, R_256_3_0);
+    UnMix( b2,  b1, R_256_3_1);
+    UnMix( b0,  b1, R_256_2_0);
+    UnMix( b2,  b3, R_256_2_1);
+    UnMix( b0,  b3, R_256_1_0);
+    UnMix( b2,  b1, R_256_1_1);
+    UnMix5( b0,  b1, R_256_0_0, k2, k3 + t2);
+    UnMix5( b2,  b3, R_256_0_1, k4 + t0, k0 + 2);
+
+    UnMix( b0,  b3, R_256_7_0);
+    UnMix( b2,  b1, R_256_7_1);
+    UnMix( b0,  b1, R_256_6_0);
+    UnMix( b2,  b3, R_256_6_1);
+    UnMix( b0,  b3, R_256_5_0);
+    UnMix( b2,  b1, R_256_5_1);
+    UnMix5( b0,  b1, R_256_4_0, k1, k2 + t1);
+    UnMix5( b2,  b3, R_256_4_1, k3 + t2, k4 + 1);
+    UnMix( b0,  b3, R_256_3_0);
+    UnMix( b2,  b1, R_256_3_1);
+    UnMix( b0,  b1, R_256_2_0);
+    UnMix( b2,  b3, R_256_2_1);
+    UnMix( b0,  b3, R_256_1_0);
+    UnMix( b2,  b1, R_256_1_1);
+    UnMix5( b0,  b1, R_256_0_0, k0, k1 + t0);
+    UnMix5( b2,  b3, R_256_0_1, k2 + t1, k3);
+
+    output[0] = b0;
+    output[1] = b1;
+    output[2] = b2;
+    output[3] = b3;
+  }
+}
+

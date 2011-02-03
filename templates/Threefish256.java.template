@@ -67,149 +67,157 @@ public class Threefish256 extends ThreefishCipher {
     long t0 = expandedTweak[0], t1 = expandedTweak[1],
       t2 = expandedTweak[2];
 
-    Mix5( b0,  b1, 14, k0, k1 + t0);
+    Mix5( b0,  b1, 14, k0, k1 + t0);		// R0
     Mix5( b2,  b3, 16, k2 + t1, k3);
-    Mix( b0,  b3, 52);
+    Mix( b0,  b3, 52);				// R1
     Mix( b2,  b1, 57);
-    Mix( b0,  b1, 23);
+    Mix( b0,  b1, 23);				// R2
     Mix( b2,  b3, 40);
-    Mix( b0,  b3, 5);
+    Mix( b0,  b3, 5);				// R3
     Mix( b2,  b1, 37);
-    Mix5( b0,  b1, 25, k1, k2 + t1);
+    Mix5( b0,  b1, 25, k1, k2 + t1);		// R4
     Mix5( b2,  b3, 33, k3 + t2, k4 + 1);
-    Mix( b0,  b3, 46);
+    Mix( b0,  b3, 46);				// R5
     Mix( b2,  b1, 12);
-    Mix( b0,  b1, 58);
+    Mix( b0,  b1, 58);				// R6
     Mix( b2,  b3, 22);
-    Mix( b0,  b3, 32);
+    Mix( b0,  b3, 32);				// R7
     Mix( b2,  b1, 32);
-    Mix5( b0,  b1, 14, k2, k3 + t2);
+
+    Mix5( b0,  b1, 14, k2, k3 + t2);		// R8
     Mix5( b2,  b3, 16, k4 + t0, k0 + 2);
-    Mix( b0,  b3, 52);
+    Mix( b0,  b3, 52);				// R9
     Mix( b2,  b1, 57);
-    Mix( b0,  b1, 23);
+    Mix( b0,  b1, 23);				// R10
     Mix( b2,  b3, 40);
-    Mix( b0,  b3, 5);
+    Mix( b0,  b3, 5);				// R1
     Mix( b2,  b1, 37);
-    Mix5( b0,  b1, 25, k3, k4 + t0);
+    Mix5( b0,  b1, 25, k3, k4 + t0);		// R12
     Mix5( b2,  b3, 33, k0 + t1, k1 + 3);
-    Mix( b0,  b3, 46);
+    Mix( b0,  b3, 46);				// R13
     Mix( b2,  b1, 12);
-    Mix( b0,  b1, 58);
+    Mix( b0,  b1, 58);				// R14
     Mix( b2,  b3, 22);
-    Mix( b0,  b3, 32);
+    Mix( b0,  b3, 32);				// R15
     Mix( b2,  b1, 32);
-    Mix5( b0,  b1, 14, k4, k0 + t1);
+
+    Mix5( b0,  b1, 14, k4, k0 + t1);		// R16
     Mix5( b2,  b3, 16, k1 + t2, k2 + 4);
-    Mix( b0,  b3, 52);
+    Mix( b0,  b3, 52);				// R17
     Mix( b2,  b1, 57);
-    Mix( b0,  b1, 23);
+    Mix( b0,  b1, 23);				// R18
     Mix( b2,  b3, 40);
-    Mix( b0,  b3, 5);
+    Mix( b0,  b3, 5);				// R19
     Mix( b2,  b1, 37);
-    Mix5( b0,  b1, 25, k0, k1 + t2);
+    Mix5( b0,  b1, 25, k0, k1 + t2);		// R20
     Mix5( b2,  b3, 33, k2 + t0, k3 + 5);
-    Mix( b0,  b3, 46);
+    Mix( b0,  b3, 46);				// R21
     Mix( b2,  b1, 12);
-    Mix( b0,  b1, 58);
+    Mix( b0,  b1, 58);				// R22
     Mix( b2,  b3, 22);
-    Mix( b0,  b3, 32);
+    Mix( b0,  b3, 32);				// R23
     Mix( b2,  b1, 32);
-    Mix5( b0,  b1, 14, k1, k2 + t0);
+
+    Mix5( b0,  b1, 14, k1, k2 + t0);		// R24
     Mix5( b2,  b3, 16, k3 + t1, k4 + 6);
-    Mix( b0,  b3, 52);
+    Mix( b0,  b3, 52);				// R25
     Mix( b2,  b1, 57);
-    Mix( b0,  b1, 23);
+    Mix( b0,  b1, 23);				// R26
     Mix( b2,  b3, 40);
-    Mix( b0,  b3, 5);
+    Mix( b0,  b3, 5);				// R27
     Mix( b2,  b1, 37);
-    Mix5( b0,  b1, 25, k2, k3 + t1);
+    Mix5( b0,  b1, 25, k2, k3 + t1);		// R28
     Mix5( b2,  b3, 33, k4 + t2, k0 + 7);
-    Mix( b0,  b3, 46);
+    Mix( b0,  b3, 46);				// R29
     Mix( b2,  b1, 12);
-    Mix( b0,  b1, 58);
+    Mix( b0,  b1, 58);				// R30
     Mix( b2,  b3, 22);
-    Mix( b0,  b3, 32);
+    Mix( b0,  b3, 32);				// R31
     Mix( b2,  b1, 32);
-    Mix5( b0,  b1, 14, k3, k4 + t2);
+
+    Mix5( b0,  b1, 14, k3, k4 + t2);		// R32
     Mix5( b2,  b3, 16, k0 + t0, k1 + 8);
-    Mix( b0,  b3, 52);
+    Mix( b0,  b3, 52);				// R33
     Mix( b2,  b1, 57);
-    Mix( b0,  b1, 23);
+    Mix( b0,  b1, 23);				// R34
     Mix( b2,  b3, 40);
-    Mix( b0,  b3, 5);
+    Mix( b0,  b3, 5);				// R35
     Mix( b2,  b1, 37);
-    Mix5( b0,  b1, 25, k4, k0 + t0);
+    Mix5( b0,  b1, 25, k4, k0 + t0);		// R36
     Mix5( b2,  b3, 33, k1 + t1, k2 + 9);
-    Mix( b0,  b3, 46);
+    Mix( b0,  b3, 46);				// R37
     Mix( b2,  b1, 12);
-    Mix( b0,  b1, 58);
+    Mix( b0,  b1, 58);				// R38
     Mix( b2,  b3, 22);
-    Mix( b0,  b3, 32);
+    Mix( b0,  b3, 32);				// R39
     Mix( b2,  b1, 32);
-    Mix5( b0,  b1, 14, k0, k1 + t1);
+
+    Mix5( b0,  b1, 14, k0, k1 + t1);		// R40
     Mix5( b2,  b3, 16, k2 + t2, k3 + 10);
-    Mix( b0,  b3, 52);
+    Mix( b0,  b3, 52);				// R41
     Mix( b2,  b1, 57);
-    Mix( b0,  b1, 23);
+    Mix( b0,  b1, 23);				// R42
     Mix( b2,  b3, 40);
-    Mix( b0,  b3, 5);
+    Mix( b0,  b3, 5);				// R43
     Mix( b2,  b1, 37);
-    Mix5( b0,  b1, 25, k1, k2 + t2);
+    Mix5( b0,  b1, 25, k1, k2 + t2);		// R44
     Mix5( b2,  b3, 33, k3 + t0, k4 + 11);
-    Mix( b0,  b3, 46);
+    Mix( b0,  b3, 46);				// R45
     Mix( b2,  b1, 12);
-    Mix( b0,  b1, 58);
+    Mix( b0,  b1, 58);				// R46
     Mix( b2,  b3, 22);
-    Mix( b0,  b3, 32);
+    Mix( b0,  b3, 32);				// R47
     Mix( b2,  b1, 32);
-    Mix5( b0,  b1, 14, k2, k3 + t0);
+
+    Mix5( b0,  b1, 14, k2, k3 + t0);		// R48
     Mix5( b2,  b3, 16, k4 + t1, k0 + 12);
-    Mix( b0,  b3, 52);
+    Mix( b0,  b3, 52);				// R49
     Mix( b2,  b1, 57);
-    Mix( b0,  b1, 23);
+    Mix( b0,  b1, 23);				// R50
     Mix( b2,  b3, 40);
-    Mix( b0,  b3, 5);
+    Mix( b0,  b3, 5);				// R51
     Mix( b2,  b1, 37);
-    Mix5( b0,  b1, 25, k3, k4 + t1);
+    Mix5( b0,  b1, 25, k3, k4 + t1);		// R52
     Mix5( b2,  b3, 33, k0 + t2, k1 + 13);
-    Mix( b0,  b3, 46);
+    Mix( b0,  b3, 46);				// R53
     Mix( b2,  b1, 12);
-    Mix( b0,  b1, 58);
+    Mix( b0,  b1, 58);				// R54
     Mix( b2,  b3, 22);
-    Mix( b0,  b3, 32);
+    Mix( b0,  b3, 32);				// R55
     Mix( b2,  b1, 32);
-    Mix5( b0,  b1, 14, k4, k0 + t2);
+
+    Mix5( b0,  b1, 14, k4, k0 + t2);		// R56
     Mix5( b2,  b3, 16, k1 + t0, k2 + 14);
-    Mix( b0,  b3, 52);
+    Mix( b0,  b3, 52);				// R57
     Mix( b2,  b1, 57);
-    Mix( b0,  b1, 23);
+    Mix( b0,  b1, 23);				// R58
     Mix( b2,  b3, 40);
-    Mix( b0,  b3, 5);
+    Mix( b0,  b3, 5);				// R59
     Mix( b2,  b1, 37);
-    Mix5( b0,  b1, 25, k0, k1 + t0);
+    Mix5( b0,  b1, 25, k0, k1 + t0);		// R60
     Mix5( b2,  b3, 33, k2 + t1, k3 + 15);
-    Mix( b0,  b3, 46);
+    Mix( b0,  b3, 46);				// R61
     Mix( b2,  b1, 12);
-    Mix( b0,  b1, 58);
+    Mix( b0,  b1, 58);				// R62
     Mix( b2,  b3, 22);
-    Mix( b0,  b3, 32);
+    Mix( b0,  b3, 32);				// R63
     Mix( b2,  b1, 32);
-    Mix5( b0,  b1, 14, k1, k2 + t1);
+
+    Mix5( b0,  b1, 14, k1, k2 + t1);		// R64
     Mix5( b2,  b3, 16, k3 + t2, k4 + 16);
-    Mix( b0,  b3, 52);
+    Mix( b0,  b3, 52);				// R65
     Mix( b2,  b1, 57);
-    Mix( b0,  b1, 23);
+    Mix( b0,  b1, 23);				// R66
     Mix( b2,  b3, 40);
-    Mix( b0,  b3, 5);
+    Mix( b0,  b3, 5);				// R67
     Mix( b2,  b1, 37);
-    Mix5( b0,  b1, 25, k2, k3 + t2);
+    Mix5( b0,  b1, 25, k2, k3 + t2);		// R68
     Mix5( b2,  b3, 33, k4 + t0, k0 + 17);
-    Mix( b0,  b3, 46);
+    Mix( b0,  b3, 46);				// R69
     Mix( b2,  b1, 12);
-    Mix( b0,  b1, 58);
+    Mix( b0,  b1, 58);				// R70
     Mix( b2,  b3, 22);
-    Mix( b0,  b3, 32);
+    Mix( b0,  b3, 32);				// R71
     Mix( b2,  b1, 32);
 
     output[0] = b0 + k3;
@@ -234,6 +242,7 @@ public class Threefish256 extends ThreefishCipher {
     b1 -= k4 + t0;
     b2 -= k0 + t1;
     b3 -= k1 + 18;
+
     UnMix( b0,  b3, 32);
     UnMix( b2,  b1, 32);
     UnMix( b0,  b1, 58);
@@ -250,6 +259,7 @@ public class Threefish256 extends ThreefishCipher {
     UnMix( b2,  b1, 57);
     UnMix5( b0,  b1, 14, k1, k2 + t1);
     UnMix5( b2,  b3, 16, k3 + t2, k4 + 16);
+
     UnMix( b0,  b3, 32);
     UnMix( b2,  b1, 32);
     UnMix( b0,  b1, 58);
@@ -266,6 +276,7 @@ public class Threefish256 extends ThreefishCipher {
     UnMix( b2,  b1, 57);
     UnMix5( b0,  b1, 14, k4, k0 + t2);
     UnMix5( b2,  b3, 16, k1 + t0, k2 + 14);
+
     UnMix( b0,  b3, 32);
     UnMix( b2,  b1, 32);
     UnMix( b0,  b1, 58);
@@ -282,6 +293,7 @@ public class Threefish256 extends ThreefishCipher {
     UnMix( b2,  b1, 57);
     UnMix5( b0,  b1, 14, k2, k3 + t0);
     UnMix5( b2,  b3, 16, k4 + t1, k0 + 12);
+
     UnMix( b0,  b3, 32);
     UnMix( b2,  b1, 32);
     UnMix( b0,  b1, 58);
@@ -298,6 +310,7 @@ public class Threefish256 extends ThreefishCipher {
     UnMix( b2,  b1, 57);
     UnMix5( b0,  b1, 14, k0, k1 + t1);
     UnMix5( b2,  b3, 16, k2 + t2, k3 + 10);
+
     UnMix( b0,  b3, 32);
     UnMix( b2,  b1, 32);
     UnMix( b0,  b1, 58);
@@ -314,6 +327,7 @@ public class Threefish256 extends ThreefishCipher {
     UnMix( b2,  b1, 57);
     UnMix5( b0,  b1, 14, k3, k4 + t2);
     UnMix5( b2,  b3, 16, k0 + t0, k1 + 8);
+
     UnMix( b0,  b3, 32);
     UnMix( b2,  b1, 32);
     UnMix( b0,  b1, 58);
@@ -330,6 +344,7 @@ public class Threefish256 extends ThreefishCipher {
     UnMix( b2,  b1, 57);
     UnMix5( b0,  b1, 14, k1, k2 + t0);
     UnMix5( b2,  b3, 16, k3 + t1, k4 + 6);
+
     UnMix( b0,  b3, 32);
     UnMix( b2,  b1, 32);
     UnMix( b0,  b1, 58);
@@ -346,6 +361,7 @@ public class Threefish256 extends ThreefishCipher {
     UnMix( b2,  b1, 57);
     UnMix5( b0,  b1, 14, k4, k0 + t1);
     UnMix5( b2,  b3, 16, k1 + t2, k2 + 4);
+
     UnMix( b0,  b3, 32);
     UnMix( b2,  b1, 32);
     UnMix( b0,  b1, 58);
@@ -362,6 +378,7 @@ public class Threefish256 extends ThreefishCipher {
     UnMix( b2,  b1, 57);
     UnMix5( b0,  b1, 14, k2, k3 + t2);
     UnMix5( b2,  b3, 16, k4 + t0, k0 + 2);
+
     UnMix( b0,  b3, 32);
     UnMix( b2,  b1, 32);
     UnMix( b0,  b1, 58);

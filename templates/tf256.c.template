@@ -1,0 +1,388 @@
+/*
+Copyright (c) 2010 Alberto Fajardo
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+The tweaks and modifications for C:
+Copyright (c) 2010, Werner Dittmann. 
+
+The same permissions granted.
+*/
+
+/*
+ * Use the following commad (on Linux for example) to generate the real
+ * C soure file:
+ *    gcc -E - < Threefish256.c.template | sed -e '/^#/d' -e 's/>>>/>>/g' > Threefish256Block.c
+ *
+ * The resulting C file needs some editing, mainly to add other #include
+ * stuff to resolve the type definitions. Linux requires a #include <stdint.h>
+ * 
+ * The mix.h contains Mix and UnMix macros that replace the Mix/UnMix calls
+ * below with the real code. This produces unrolled loops. This technique
+ * saves a lot of error prone editing.
+ * sed just removes some lines that gcc -E inserted.
+ */
+
+#include "mix.h"
+#include "shifter.h"
+
+void threefishEncrypt256(ThreefishKey_t* keyCtx, uint64_t* input, uint64_t* output)
+  {
+    uint64_t b[4];
+    uint64_t* k = keyCtx->key;
+    uint64_t* t = keyCtx->tweak;
+
+    memcpy(b, input, 4 * sizeof(uint64_t));
+
+    Mix5( b[0],  b[1], R_256_0_0, k[0], k[1] + t[0]);
+    Mix5( b[2],  b[3], R_256_0_1, k[2] + t[1], k[3]);
+    Mix( b[0],  b[3], R_256_1_0);
+    Mix( b[2],  b[1], R_256_1_1);
+    Mix( b[0],  b[1], R_256_2_0);
+    Mix( b[2],  b[3], R_256_2_1);
+    Mix( b[0],  b[3], R_256_3_0);
+    Mix( b[2],  b[1], R_256_3_1);
+    Mix5( b[0],  b[1], R_256_4_0, k[1], k[2] + t[1]);
+    Mix5( b[2],  b[3], R_256_4_1, k[3] + t[2], k[4] + 1);
+    Mix( b[0],  b[3], R_256_5_0);
+    Mix( b[2],  b[1], R_256_5_1);
+    Mix( b[0],  b[1], R_256_6_0);
+    Mix( b[2],  b[3], R_256_6_1);
+    Mix( b[0],  b[3], R_256_7_0);
+    Mix( b[2],  b[1], R_256_7_1);
+    
+    Mix5( b[0],  b[1], R_256_0_0, k[2], k[3] + t[2]);
+    Mix5( b[2],  b[3], R_256_0_1, k[4] + t[0], k[0] + 2);
+    Mix( b[0],  b[3], R_256_1_0);
+    Mix( b[2],  b[1], R_256_1_1);
+    Mix( b[0],  b[1], R_256_2_0);
+    Mix( b[2],  b[3], R_256_2_1);
+    Mix( b[0],  b[3], R_256_3_0);
+    Mix( b[2],  b[1], R_256_3_1);
+    Mix5( b[0],  b[1], R_256_4_0, k[3], k[4] + t[0]);
+    Mix5( b[2],  b[3], R_256_4_1, k[0] + t[1], k[1] + 3);
+    Mix( b[0],  b[3], R_256_5_0);
+    Mix( b[2],  b[1], R_256_5_1);
+    Mix( b[0],  b[1], R_256_6_0);
+    Mix( b[2],  b[3], R_256_6_1);
+    Mix( b[0],  b[3], R_256_7_0);
+    Mix( b[2],  b[1], R_256_7_1);
+    
+    Mix5( b[0],  b[1], R_256_0_0, k[4], k[0] + t[1]);
+    Mix5( b[2],  b[3], R_256_0_1, k[1] + t[2], k[2] + 4);
+    Mix( b[0],  b[3], R_256_1_0);
+    Mix( b[2],  b[1], R_256_1_1);
+    Mix( b[0],  b[1], R_256_2_0);
+    Mix( b[2],  b[3], R_256_2_1);
+    Mix( b[0],  b[3], R_256_3_0);
+    Mix( b[2],  b[1], R_256_3_1);
+    Mix5( b[0],  b[1], R_256_4_0, k[0], k[1] + t[2]);
+    Mix5( b[2],  b[3], R_256_4_1, k[2] + t[0], k[3] + 5);
+    Mix( b[0],  b[3], R_256_5_0);
+    Mix( b[2],  b[1], R_256_5_1);
+    Mix( b[0],  b[1], R_256_6_0);
+    Mix( b[2],  b[3], R_256_6_1);
+    Mix( b[0],  b[3], R_256_7_0);
+    Mix( b[2],  b[1], R_256_7_1);
+    
+    Mix5( b[0],  b[1], R_256_0_0, k[1], k[2] + t[0]);
+    Mix5( b[2],  b[3], R_256_0_1, k[3] + t[1], k[4] + 6);
+    Mix( b[0],  b[3], R_256_1_0);
+    Mix( b[2],  b[1], R_256_1_1);
+    Mix( b[0],  b[1], R_256_2_0);
+    Mix( b[2],  b[3], R_256_2_1);
+    Mix( b[0],  b[3], R_256_3_0);
+    Mix( b[2],  b[1], R_256_3_1);
+    Mix5( b[0],  b[1], R_256_4_0, k[2], k[3] + t[1]);
+    Mix5( b[2],  b[3], R_256_4_1, k[4] + t[2], k[0] + 7);
+    Mix( b[0],  b[3], R_256_5_0);
+    Mix( b[2],  b[1], R_256_5_1);
+    Mix( b[0],  b[1], R_256_6_0);
+    Mix( b[2],  b[3], R_256_6_1);
+    Mix( b[0],  b[3], R_256_7_0);
+    Mix( b[2],  b[1], R_256_7_1);
+    
+    Mix5( b[0],  b[1], R_256_0_0, k[3], k[4] + t[2]);
+    Mix5( b[2],  b[3], R_256_0_1, k[0] + t[0], k[1] + 8);
+    Mix( b[0],  b[3], R_256_1_0);
+    Mix( b[2],  b[1], R_256_1_1);
+    Mix( b[0],  b[1], R_256_2_0);
+    Mix( b[2],  b[3], R_256_2_1);
+    Mix( b[0],  b[3], R_256_3_0);
+    Mix( b[2],  b[1], R_256_3_1);
+    Mix5( b[0],  b[1], R_256_4_0, k[4], k[0] + t[0]);
+    Mix5( b[2],  b[3], R_256_4_1, k[1] + t[1], k[2] + 9);
+    Mix( b[0],  b[3], R_256_5_0);
+    Mix( b[2],  b[1], R_256_5_1);
+    Mix( b[0],  b[1], R_256_6_0);
+    Mix( b[2],  b[3], R_256_6_1);
+    Mix( b[0],  b[3], R_256_7_0);
+    Mix( b[2],  b[1], R_256_7_1);
+    
+    Mix5( b[0],  b[1], R_256_0_0, k[0], k[1] + t[1]);
+    Mix5( b[2],  b[3], R_256_0_1, k[2] + t[2], k[3] + 10);
+    Mix( b[0],  b[3], R_256_1_0);
+    Mix( b[2],  b[1], R_256_1_1);
+    Mix( b[0],  b[1], R_256_2_0);
+    Mix( b[2],  b[3], R_256_2_1);
+    Mix( b[0],  b[3], R_256_3_0);
+    Mix( b[2],  b[1], R_256_3_1);
+    Mix5( b[0],  b[1], R_256_4_0, k[1], k[2] + t[2]);
+    Mix5( b[2],  b[3], R_256_4_1, k[3] + t[0], k[4] + 11);
+    Mix( b[0],  b[3], R_256_5_0);
+    Mix( b[2],  b[1], R_256_5_1);
+    Mix( b[0],  b[1], R_256_6_0);
+    Mix( b[2],  b[3], R_256_6_1);
+    Mix( b[0],  b[3], R_256_7_0);
+    Mix( b[2],  b[1], R_256_7_1);
+    
+    Mix5( b[0],  b[1], R_256_0_0, k[2], k[3] + t[0]);
+    Mix5( b[2],  b[3], R_256_0_1, k[4] + t[1], k[0] + 12);
+    Mix( b[0],  b[3], R_256_1_0);
+    Mix( b[2],  b[1], R_256_1_1);
+    Mix( b[0],  b[1], R_256_2_0);
+    Mix( b[2],  b[3], R_256_2_1);
+    Mix( b[0],  b[3], R_256_3_0);
+    Mix( b[2],  b[1], R_256_3_1);
+    Mix5( b[0],  b[1], R_256_4_0, k[3], k[4] + t[1]);
+    Mix5( b[2],  b[3], R_256_4_1, k[0] + t[2], k[1] + 13);
+    Mix( b[0],  b[3], R_256_5_0);
+    Mix( b[2],  b[1], R_256_5_1);
+    Mix( b[0],  b[1], R_256_6_0);
+    Mix( b[2],  b[3], R_256_6_1);
+    Mix( b[0],  b[3], R_256_7_0);
+    Mix( b[2],  b[1], R_256_7_1);
+    
+    Mix5( b[0],  b[1], R_256_0_0, k[4], k[0] + t[2]);
+    Mix5( b[2],  b[3], R_256_0_1, k[1] + t[0], k[2] + 14);
+    Mix( b[0],  b[3], R_256_1_0);
+    Mix( b[2],  b[1], R_256_1_1);
+    Mix( b[0],  b[1], R_256_2_0);
+    Mix( b[2],  b[3], R_256_2_1);
+    Mix( b[0],  b[3], R_256_3_0);
+    Mix( b[2],  b[1], R_256_3_1);
+    Mix5( b[0],  b[1], R_256_4_0, k[0], k[1] + t[0]);
+    Mix5( b[2],  b[3], R_256_4_1, k[2] + t[1], k[3] + 15);
+    Mix( b[0],  b[3], R_256_5_0);
+    Mix( b[2],  b[1], R_256_5_1);
+    Mix( b[0],  b[1], R_256_6_0);
+    Mix( b[2],  b[3], R_256_6_1);
+    Mix( b[0],  b[3], R_256_7_0);
+    Mix( b[2],  b[1], R_256_7_1);
+    
+    Mix5( b[0],  b[1], R_256_0_0, k[1], k[2] + t[1]);
+    Mix5( b[2],  b[3], R_256_0_1, k[3] + t[2], k[4] + 16);
+    Mix( b[0],  b[3], R_256_1_0);
+    Mix( b[2],  b[1], R_256_1_1);
+    Mix( b[0],  b[1], R_256_2_0);
+    Mix( b[2],  b[3], R_256_2_1);
+    Mix( b[0],  b[3], R_256_3_0);
+    Mix( b[2],  b[1], R_256_3_1);
+    Mix5( b[0],  b[1], R_256_4_0, k[2], k[3] + t[2]);
+    Mix5( b[2],  b[3], R_256_4_1, k[4] + t[0], k[0] + 17);
+    Mix( b[0],  b[3], R_256_5_0);
+    Mix( b[2],  b[1], R_256_5_1);
+    Mix( b[0],  b[1], R_256_6_0);
+    Mix( b[2],  b[3], R_256_6_1);
+    Mix( b[0],  b[3], R_256_7_0);
+    Mix( b[2],  b[1], R_256_7_1);
+
+    output[0] = b[0] + k[3];
+    output[1] = b[1] + k[4] + t[0];
+    output[2] = b[2] + k[0] + t[1];
+    output[3] = b[3] + k[1] + 18;
+  }
+
+void threefishDecrypt256(ThreefishKey_t* keyCtx, uint64_t* input, uint64_t* output)
+  {
+    // Cache the block, key, and tweak
+    uint64_t b[4];
+    uint64_t* k = keyCtx->key;
+    uint64_t* t = keyCtx->tweak;
+    uint64_t tmp;
+
+    memcpy(b, input, 4 * sizeof(uint64_t));
+
+    b[0] -= k[3];
+    b[1] -= k[4] + t[0];
+    b[2] -= k[0] + t[1];
+    b[3] -= k[1] + 18;
+    UnMix( b[0],  b[3], R_256_7_0);
+    UnMix( b[2],  b[1], R_256_7_1);
+    UnMix( b[0],  b[1], R_256_6_0);
+    UnMix( b[2],  b[3], R_256_6_1);
+    UnMix( b[0],  b[3], R_256_5_0);
+    UnMix( b[2],  b[1], R_256_5_1);
+    UnMix5( b[0],  b[1], R_256_4_0, k[2], k[3] + t[2]);
+    UnMix5( b[2],  b[3], R_256_4_1, k[4] + t[0], k[0] + 17);
+    UnMix( b[0],  b[3], R_256_3_0);
+    UnMix( b[2],  b[1], R_256_3_1);
+    UnMix( b[0],  b[1], R_256_2_0);
+    UnMix( b[2],  b[3], R_256_2_1);
+    UnMix( b[0],  b[3], R_256_1_0);
+    UnMix( b[2],  b[1], R_256_1_1);
+    UnMix5( b[0],  b[1], R_256_0_0, k[1], k[2] + t[1]);
+    UnMix5( b[2],  b[3], R_256_0_1, k[3] + t[2], k[4] + 16);
+    
+    UnMix( b[0],  b[3], R_256_7_0);
+    UnMix( b[2],  b[1], R_256_7_1);
+    UnMix( b[0],  b[1], R_256_6_0);
+    UnMix( b[2],  b[3], R_256_6_1);
+    UnMix( b[0],  b[3], R_256_5_0);
+    UnMix( b[2],  b[1], R_256_5_1);
+    UnMix5( b[0],  b[1], R_256_4_0, k[0], k[1] + t[0]);
+    UnMix5( b[2],  b[3], R_256_4_1, k[2] + t[1], k[3] + 15);
+    UnMix( b[0],  b[3], R_256_3_0);
+    UnMix( b[2],  b[1], R_256_3_1);
+    UnMix( b[0],  b[1], R_256_2_0);
+    UnMix( b[2],  b[3], R_256_2_1);
+    UnMix( b[0],  b[3], R_256_1_0);
+    UnMix( b[2],  b[1], R_256_1_1);
+    UnMix5( b[0],  b[1], R_256_0_0, k[4], k[0] + t[2]);
+    UnMix5( b[2],  b[3], R_256_0_1, k[1] + t[0], k[2] + 14);
+    
+    UnMix( b[0],  b[3], R_256_7_0);
+    UnMix( b[2],  b[1], R_256_7_1);
+    UnMix( b[0],  b[1], R_256_6_0);
+    UnMix( b[2],  b[3], R_256_6_1);
+    UnMix( b[0],  b[3], R_256_5_0);
+    UnMix( b[2],  b[1], R_256_5_1);
+    UnMix5( b[0],  b[1], R_256_4_0, k[3], k[4] + t[1]);
+    UnMix5( b[2],  b[3], R_256_4_1, k[0] + t[2], k[1] + 13);
+    UnMix( b[0],  b[3], R_256_3_0);
+    UnMix( b[2],  b[1], R_256_3_1);
+    UnMix( b[0],  b[1], R_256_2_0);
+    UnMix( b[2],  b[3], R_256_2_1);
+    UnMix( b[0],  b[3], R_256_1_0);
+    UnMix( b[2],  b[1], R_256_1_1);
+    UnMix5( b[0],  b[1], R_256_0_0, k[2], k[3] + t[0]);
+    UnMix5( b[2],  b[3], R_256_0_1, k[4] + t[1], k[0] + 12);
+    
+    UnMix( b[0],  b[3], R_256_7_0);
+    UnMix( b[2],  b[1], R_256_7_1);
+    UnMix( b[0],  b[1], R_256_6_0);
+    UnMix( b[2],  b[3], R_256_6_1);
+    UnMix( b[0],  b[3], R_256_5_0);
+    UnMix( b[2],  b[1], R_256_5_1);
+    UnMix5( b[0],  b[1], R_256_4_0, k[1], k[2] + t[2]);
+    UnMix5( b[2],  b[3], R_256_4_1, k[3] + t[0], k[4] + 11);
+    UnMix( b[0],  b[3], R_256_3_0);
+    UnMix( b[2],  b[1], R_256_3_1);
+    UnMix( b[0],  b[1], R_256_2_0);
+    UnMix( b[2],  b[3], R_256_2_1);
+    UnMix( b[0],  b[3], R_256_1_0);
+    UnMix( b[2],  b[1], R_256_1_1);
+    UnMix5( b[0],  b[1], R_256_0_0, k[0], k[1] + t[1]);
+    UnMix5( b[2],  b[3], R_256_0_1, k[2] + t[2], k[3] + 10);
+    
+    UnMix( b[0],  b[3], R_256_7_0);
+    UnMix( b[2],  b[1], R_256_7_1);
+    UnMix( b[0],  b[1], R_256_6_0);
+    UnMix( b[2],  b[3], R_256_6_1);
+    UnMix( b[0],  b[3], R_256_5_0);
+    UnMix( b[2],  b[1], R_256_5_1);
+    UnMix5( b[0],  b[1], R_256_4_0, k[4], k[0] + t[0]);
+    UnMix5( b[2],  b[3], R_256_4_1, k[1] + t[1], k[2] + 9);
+    UnMix( b[0],  b[3], R_256_3_0);
+    UnMix( b[2],  b[1], R_256_3_1);
+    UnMix( b[0],  b[1], R_256_2_0);
+    UnMix( b[2],  b[3], R_256_2_1);
+    UnMix( b[0],  b[3], R_256_1_0);
+    UnMix( b[2],  b[1], R_256_1_1);
+    UnMix5( b[0],  b[1], R_256_0_0, k[3], k[4] + t[2]);
+    UnMix5( b[2],  b[3], R_256_0_1, k[0] + t[0], k[1] + 8);
+    
+    UnMix( b[0],  b[3], R_256_7_0);
+    UnMix( b[2],  b[1], R_256_7_1);
+    UnMix( b[0],  b[1], R_256_6_0);
+    UnMix( b[2],  b[3], R_256_6_1);
+    UnMix( b[0],  b[3], R_256_5_0);
+    UnMix( b[2],  b[1], R_256_5_1);
+    UnMix5( b[0],  b[1], R_256_4_0, k[2], k[3] + t[1]);
+    UnMix5( b[2],  b[3], R_256_4_1, k[4] + t[2], k[0] + 7);
+    UnMix( b[0],  b[3], R_256_3_0);
+    UnMix( b[2],  b[1], R_256_3_1);
+    UnMix( b[0],  b[1], R_256_2_0);
+    UnMix( b[2],  b[3], R_256_2_1);
+    UnMix( b[0],  b[3], R_256_1_0);
+    UnMix( b[2],  b[1], R_256_1_1);
+    UnMix5( b[0],  b[1], R_256_0_0, k[1], k[2] + t[0]);
+    UnMix5( b[2],  b[3], R_256_0_1, k[3] + t[1], k[4] + 6);
+    
+    UnMix( b[0],  b[3], R_256_7_0);
+    UnMix( b[2],  b[1], R_256_7_1);
+    UnMix( b[0],  b[1], R_256_6_0);
+    UnMix( b[2],  b[3], R_256_6_1);
+    UnMix( b[0],  b[3], R_256_5_0);
+    UnMix( b[2],  b[1], R_256_5_1);
+    UnMix5( b[0],  b[1], R_256_4_0, k[0], k[1] + t[2]);
+    UnMix5( b[2],  b[3], R_256_4_1, k[2] + t[0], k[3] + 5);
+    UnMix( b[0],  b[3], R_256_3_0);
+    UnMix( b[2],  b[1], R_256_3_1);
+    UnMix( b[0],  b[1], R_256_2_0);
+    UnMix( b[2],  b[3], R_256_2_1);
+    UnMix( b[0],  b[3], R_256_1_0);
+    UnMix( b[2],  b[1], R_256_1_1);
+    UnMix5( b[0],  b[1], R_256_0_0, k[4], k[0] + t[1]);
+    UnMix5( b[2],  b[3], R_256_0_1, k[1] + t[2], k[2] + 4);
+    
+    UnMix( b[0],  b[3], R_256_7_0);
+    UnMix( b[2],  b[1], R_256_7_1);
+    UnMix( b[0],  b[1], R_256_6_0);
+    UnMix( b[2],  b[3], R_256_6_1);
+    UnMix( b[0],  b[3], R_256_5_0);
+    UnMix( b[2],  b[1], R_256_5_1);
+    UnMix5( b[0],  b[1], R_256_4_0, k[3], k[4] + t[0]);
+    UnMix5( b[2],  b[3], R_256_4_1, k[0] + t[1], k[1] + 3);
+    UnMix( b[0],  b[3], R_256_3_0);
+    UnMix( b[2],  b[1], R_256_3_1);
+    UnMix( b[0],  b[1], R_256_2_0);
+    UnMix( b[2],  b[3], R_256_2_1);
+    UnMix( b[0],  b[3], R_256_1_0);
+    UnMix( b[2],  b[1], R_256_1_1);
+    UnMix5( b[0],  b[1], R_256_0_0, k[2], k[3] + t[2]);
+    UnMix5( b[2],  b[3], R_256_0_1, k[4] + t[0], k[0] + 2);
+    
+    UnMix( b[0],  b[3], R_256_7_0);
+    UnMix( b[2],  b[1], R_256_7_1);
+    UnMix( b[0],  b[1], R_256_6_0);
+    UnMix( b[2],  b[3], R_256_6_1);
+    UnMix( b[0],  b[3], R_256_5_0);
+    UnMix( b[2],  b[1], R_256_5_1);
+    UnMix5( b[0],  b[1], R_256_4_0, k[1], k[2] + t[1]);
+    UnMix5( b[2],  b[3], R_256_4_1, k[3] + t[2], k[4] + 1);
+    UnMix( b[0],  b[3], R_256_3_0);
+    UnMix( b[2],  b[1], R_256_3_1);
+    UnMix( b[0],  b[1], R_256_2_0);
+    UnMix( b[2],  b[3], R_256_2_1);
+    UnMix( b[0],  b[3], R_256_1_0);
+    UnMix( b[2],  b[1], R_256_1_1);
+    UnMix5( b[0],  b[1], R_256_0_0, k[0], k[1] + t[0]);
+    UnMix5( b[2],  b[3], R_256_0_1, k[2] + t[1], k[3]);
+
+    output[0] = b[0];
+    output[1] = b[1];
+    output[2] = b[2];
+    output[3] = b[3];
+  }
+
+

@@ -71,151 +71,151 @@ public class Threefish512  extends ThreefishCipher {
         long t0 = expandedTweak[0], t1 = expandedTweak[1],
         t2 = expandedTweak[2];
 
-        Mix5( b0,  b1, 46, k0, k1);
+        Mix5( b0,  b1, 46, k0, k1);		// R0
         Mix5( b2,  b3, 36, k2, k3);
         Mix5( b4,  b5, 19, k4, k5 + t0);
         Mix5( b6,  b7, 37, k6 + t1, k7);
-        Mix( b2,  b1, 33);
+        Mix( b2,  b1, 33);			// R1
         Mix( b4,  b7, 27);
         Mix( b6,  b5, 14);
         Mix( b0,  b3, 42);
-        Mix( b4,  b1, 17);
+        Mix( b4,  b1, 17);			// R2
         Mix( b6,  b3, 49);
         Mix( b0,  b5, 36);
         Mix( b2,  b7, 39);
-        Mix( b6,  b1, 44);
+        Mix( b6,  b1, 44);			// R3
         Mix( b0,  b7, 9);
         Mix( b2,  b5, 54);
         Mix( b4,  b3, 56);
-        Mix5( b0,  b1, 39, k1, k2);
+        Mix5( b0,  b1, 39, k1, k2);		// R4
         Mix5( b2,  b3, 30, k3, k4);
         Mix5( b4,  b5, 34, k5, k6 + t1);
         Mix5( b6,  b7, 24, k7 + t2, k8 + 1);
-        Mix( b2,  b1, 13);
+        Mix( b2,  b1, 13);			// R5
         Mix( b4,  b7, 50);
         Mix( b6,  b5, 10);
         Mix( b0,  b3, 17);
-        Mix( b4,  b1, 25);
+        Mix( b4,  b1, 25);			// R6
         Mix( b6,  b3, 29);
         Mix( b0,  b5, 39);
         Mix( b2,  b7, 43);
-        Mix( b6,  b1, 8);
+        Mix( b6,  b1, 8);			// R7
         Mix( b0,  b7, 35);
         Mix( b2,  b5, 56);
         Mix( b4,  b3, 22);
-        Mix5( b0,  b1, 46, k2, k3);
+        Mix5( b0,  b1, 46, k2, k3);		// R8
         Mix5( b2,  b3, 36, k4, k5);
         Mix5( b4,  b5, 19, k6, k7 + t2);
         Mix5( b6,  b7, 37, k8 + t0, k0 + 2);
-        Mix( b2,  b1, 33);
+        Mix( b2,  b1, 33);			// R9
         Mix( b4,  b7, 27);
         Mix( b6,  b5, 14);
         Mix( b0,  b3, 42);
-        Mix( b4,  b1, 17);
+        Mix( b4,  b1, 17);			// R10
         Mix( b6,  b3, 49);
         Mix( b0,  b5, 36);
         Mix( b2,  b7, 39);
-        Mix( b6,  b1, 44);
+        Mix( b6,  b1, 44);			// R11
         Mix( b0,  b7, 9);
         Mix( b2,  b5, 54);
         Mix( b4,  b3, 56);
-        Mix5( b0,  b1, 39, k3, k4);
+        Mix5( b0,  b1, 39, k3, k4);		// R12
         Mix5( b2,  b3, 30, k5, k6);
         Mix5( b4,  b5, 34, k7, k8 + t0);
         Mix5( b6,  b7, 24, k0 + t1, k1 + 3);
-        Mix( b2,  b1, 13);
+        Mix( b2,  b1, 13);			// R13
         Mix( b4,  b7, 50);
         Mix( b6,  b5, 10);
         Mix( b0,  b3, 17);
-        Mix( b4,  b1, 25);
+        Mix( b4,  b1, 25);			// R14
         Mix( b6,  b3, 29);
         Mix( b0,  b5, 39);
         Mix( b2,  b7, 43);
-        Mix( b6,  b1, 8);
+        Mix( b6,  b1, 8);			// R15
         Mix( b0,  b7, 35);
         Mix( b2,  b5, 56);
         Mix( b4,  b3, 22);
-        Mix5( b0,  b1, 46, k4, k5);
+        Mix5( b0,  b1, 46, k4, k5);		// R16
         Mix5( b2,  b3, 36, k6, k7);
         Mix5( b4,  b5, 19, k8, k0 + t1);
         Mix5( b6,  b7, 37, k1 + t2, k2 + 4);
-        Mix( b2,  b1, 33);
+        Mix( b2,  b1, 33);			// R17
         Mix( b4,  b7, 27);
         Mix( b6,  b5, 14);
         Mix( b0,  b3, 42);
-        Mix( b4,  b1, 17);
+        Mix( b4,  b1, 17);			// R18
         Mix( b6,  b3, 49);
         Mix( b0,  b5, 36);
         Mix( b2,  b7, 39);
-        Mix( b6,  b1, 44);
+        Mix( b6,  b1, 44);			// R19
         Mix( b0,  b7, 9);
         Mix( b2,  b5, 54);
         Mix( b4,  b3, 56);
-        Mix5( b0,  b1, 39, k5, k6);
+        Mix5( b0,  b1, 39, k5, k6);		// R20
         Mix5( b2,  b3, 30, k7, k8);
         Mix5( b4,  b5, 34, k0, k1 + t2);
         Mix5( b6,  b7, 24, k2 + t0, k3 + 5);
-        Mix( b2,  b1, 13);
+        Mix( b2,  b1, 13);			// R21
         Mix( b4,  b7, 50);
         Mix( b6,  b5, 10);
         Mix( b0,  b3, 17);
-        Mix( b4,  b1, 25);
+        Mix( b4,  b1, 25);			// R22
         Mix( b6,  b3, 29);
         Mix( b0,  b5, 39);
         Mix( b2,  b7, 43);
-        Mix( b6,  b1, 8);
+        Mix( b6,  b1, 8);			// R23
         Mix( b0,  b7, 35);
         Mix( b2,  b5, 56);
         Mix( b4,  b3, 22);
-        Mix5( b0,  b1, 46, k6, k7);
+        Mix5( b0,  b1, 46, k6, k7);		// R24
         Mix5( b2,  b3, 36, k8, k0);
         Mix5( b4,  b5, 19, k1, k2 + t0);
         Mix5( b6,  b7, 37, k3 + t1, k4 + 6);
-        Mix( b2,  b1, 33);
+        Mix( b2,  b1, 33);			// R25
         Mix( b4,  b7, 27);
         Mix( b6,  b5, 14);
         Mix( b0,  b3, 42);
-        Mix( b4,  b1, 17);
+        Mix( b4,  b1, 17);			// R26
         Mix( b6,  b3, 49);
         Mix( b0,  b5, 36);
         Mix( b2,  b7, 39);
-        Mix( b6,  b1, 44);
+        Mix( b6,  b1, 44);			// R27
         Mix( b0,  b7, 9);
         Mix( b2,  b5, 54);
         Mix( b4,  b3, 56);
-        Mix5( b0,  b1, 39, k7, k8);
+        Mix5( b0,  b1, 39, k7, k8);		// R28
         Mix5( b2,  b3, 30, k0, k1);
         Mix5( b4,  b5, 34, k2, k3 + t1);
         Mix5( b6,  b7, 24, k4 + t2, k5 + 7);
-        Mix( b2,  b1, 13);
+        Mix( b2,  b1, 13);			// R29
         Mix( b4,  b7, 50);
         Mix( b6,  b5, 10);
         Mix( b0,  b3, 17);
-        Mix( b4,  b1, 25);
+        Mix( b4,  b1, 25);			// R30
         Mix( b6,  b3, 29);
         Mix( b0,  b5, 39);
         Mix( b2,  b7, 43);
-        Mix( b6,  b1, 8);
+        Mix( b6,  b1, 8);			// R31
         Mix( b0,  b7, 35);
         Mix( b2,  b5, 56);
         Mix( b4,  b3, 22);
-        Mix5( b0,  b1, 46, k8, k0);
+        Mix5( b0,  b1, 46, k8, k0);		// R32
         Mix5( b2,  b3, 36, k1, k2);
         Mix5( b4,  b5, 19, k3, k4 + t2);
         Mix5( b6,  b7, 37, k5 + t0, k6 + 8);
-        Mix( b2,  b1, 33);
+        Mix( b2,  b1, 33);			// R33
         Mix( b4,  b7, 27);
         Mix( b6,  b5, 14);
         Mix( b0,  b3, 42);
-        Mix( b4,  b1, 17);
+        Mix( b4,  b1, 17);			// R34
         Mix( b6,  b3, 49);
         Mix( b0,  b5, 36);
         Mix( b2,  b7, 39);
-        Mix( b6,  b1, 44);
+        Mix( b6,  b1, 44);			// R35
         Mix( b0,  b7, 9);
         Mix( b2,  b5, 54);
         Mix( b4,  b3, 56);
-        Mix5( b0,  b1, 39, k0, k1);
+        Mix5( b0,  b1, 39, k0, k1);		// R36
         Mix5( b2,  b3, 30, k2, k3);
         Mix5( b4,  b5, 34, k4, k5 + t0);
         Mix5( b6,  b7, 24, k6 + t1, k7 + 9);

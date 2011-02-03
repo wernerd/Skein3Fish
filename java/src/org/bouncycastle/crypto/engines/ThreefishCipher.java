@@ -285,6 +285,7 @@ public class ThreefishCipher implements BlockCipher {
             b2 += b3; b3 = ((b3 << 22) | (b3 >>> (64 - 22))) ^ b2;
             b0 += b3; b3 = ((b3 << 32) | (b3 >>> (64 - 32))) ^ b0;
             b2 += b1; b1 = ((b1 << 32) | (b1 >>> (64 - 32))) ^ b2;
+
             b1 += k3 + t2; b0 += b1 + k2; b1 = ((b1 << 14) | (b1 >>> (64 - 14))) ^ b0;
             b3 += k0 + 2; b2 += b3 + k4 + t0; b3 = ((b3 << 16) | (b3 >>> (64 - 16))) ^ b2;
             b0 += b3; b3 = ((b3 << 52) | (b3 >>> (64 - 52))) ^ b0;
@@ -301,6 +302,7 @@ public class ThreefishCipher implements BlockCipher {
             b2 += b3; b3 = ((b3 << 22) | (b3 >>> (64 - 22))) ^ b2;
             b0 += b3; b3 = ((b3 << 32) | (b3 >>> (64 - 32))) ^ b0;
             b2 += b1; b1 = ((b1 << 32) | (b1 >>> (64 - 32))) ^ b2;
+
             b1 += k0 + t1; b0 += b1 + k4; b1 = ((b1 << 14) | (b1 >>> (64 - 14))) ^ b0;
             b3 += k2 + 4; b2 += b3 + k1 + t2; b3 = ((b3 << 16) | (b3 >>> (64 - 16))) ^ b2;
             b0 += b3; b3 = ((b3 << 52) | (b3 >>> (64 - 52))) ^ b0;
@@ -317,6 +319,7 @@ public class ThreefishCipher implements BlockCipher {
             b2 += b3; b3 = ((b3 << 22) | (b3 >>> (64 - 22))) ^ b2;
             b0 += b3; b3 = ((b3 << 32) | (b3 >>> (64 - 32))) ^ b0;
             b2 += b1; b1 = ((b1 << 32) | (b1 >>> (64 - 32))) ^ b2;
+
             b1 += k2 + t0; b0 += b1 + k1; b1 = ((b1 << 14) | (b1 >>> (64 - 14))) ^ b0;
             b3 += k4 + 6; b2 += b3 + k3 + t1; b3 = ((b3 << 16) | (b3 >>> (64 - 16))) ^ b2;
             b0 += b3; b3 = ((b3 << 52) | (b3 >>> (64 - 52))) ^ b0;
@@ -333,6 +336,7 @@ public class ThreefishCipher implements BlockCipher {
             b2 += b3; b3 = ((b3 << 22) | (b3 >>> (64 - 22))) ^ b2;
             b0 += b3; b3 = ((b3 << 32) | (b3 >>> (64 - 32))) ^ b0;
             b2 += b1; b1 = ((b1 << 32) | (b1 >>> (64 - 32))) ^ b2;
+
             b1 += k4 + t2; b0 += b1 + k3; b1 = ((b1 << 14) | (b1 >>> (64 - 14))) ^ b0;
             b3 += k1 + 8; b2 += b3 + k0 + t0; b3 = ((b3 << 16) | (b3 >>> (64 - 16))) ^ b2;
             b0 += b3; b3 = ((b3 << 52) | (b3 >>> (64 - 52))) ^ b0;
@@ -349,6 +353,7 @@ public class ThreefishCipher implements BlockCipher {
             b2 += b3; b3 = ((b3 << 22) | (b3 >>> (64 - 22))) ^ b2;
             b0 += b3; b3 = ((b3 << 32) | (b3 >>> (64 - 32))) ^ b0;
             b2 += b1; b1 = ((b1 << 32) | (b1 >>> (64 - 32))) ^ b2;
+
             b1 += k1 + t1; b0 += b1 + k0; b1 = ((b1 << 14) | (b1 >>> (64 - 14))) ^ b0;
             b3 += k3 + 10; b2 += b3 + k2 + t2; b3 = ((b3 << 16) | (b3 >>> (64 - 16))) ^ b2;
             b0 += b3; b3 = ((b3 << 52) | (b3 >>> (64 - 52))) ^ b0;
@@ -365,6 +370,7 @@ public class ThreefishCipher implements BlockCipher {
             b2 += b3; b3 = ((b3 << 22) | (b3 >>> (64 - 22))) ^ b2;
             b0 += b3; b3 = ((b3 << 32) | (b3 >>> (64 - 32))) ^ b0;
             b2 += b1; b1 = ((b1 << 32) | (b1 >>> (64 - 32))) ^ b2;
+
             b1 += k3 + t0; b0 += b1 + k2; b1 = ((b1 << 14) | (b1 >>> (64 - 14))) ^ b0;
             b3 += k0 + 12; b2 += b3 + k4 + t1; b3 = ((b3 << 16) | (b3 >>> (64 - 16))) ^ b2;
             b0 += b3; b3 = ((b3 << 52) | (b3 >>> (64 - 52))) ^ b0;
@@ -381,6 +387,7 @@ public class ThreefishCipher implements BlockCipher {
             b2 += b3; b3 = ((b3 << 22) | (b3 >>> (64 - 22))) ^ b2;
             b0 += b3; b3 = ((b3 << 32) | (b3 >>> (64 - 32))) ^ b0;
             b2 += b1; b1 = ((b1 << 32) | (b1 >>> (64 - 32))) ^ b2;
+
             b1 += k0 + t2; b0 += b1 + k4; b1 = ((b1 << 14) | (b1 >>> (64 - 14))) ^ b0;
             b3 += k2 + 14; b2 += b3 + k1 + t0; b3 = ((b3 << 16) | (b3 >>> (64 - 16))) ^ b2;
             b0 += b3; b3 = ((b3 << 52) | (b3 >>> (64 - 52))) ^ b0;
@@ -397,6 +404,7 @@ public class ThreefishCipher implements BlockCipher {
             b2 += b3; b3 = ((b3 << 22) | (b3 >>> (64 - 22))) ^ b2;
             b0 += b3; b3 = ((b3 << 32) | (b3 >>> (64 - 32))) ^ b0;
             b2 += b1; b1 = ((b1 << 32) | (b1 >>> (64 - 32))) ^ b2;
+
             b1 += k2 + t1; b0 += b1 + k1; b1 = ((b1 << 14) | (b1 >>> (64 - 14))) ^ b0;
             b3 += k4 + 16; b2 += b3 + k3 + t2; b3 = ((b3 << 16) | (b3 >>> (64 - 16))) ^ b2;
             b0 += b3; b3 = ((b3 << 52) | (b3 >>> (64 - 52))) ^ b0;
@@ -452,6 +460,7 @@ public class ThreefishCipher implements BlockCipher {
             tmp = b1 ^ b2; b1 = (tmp >>> 57) | (tmp << (64 - 57)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 14) | (tmp << (64 - 14)); b0 -= b1 + k1; b1 -= k2 + t1;
             tmp = b3 ^ b2; b3 = (tmp >>> 16) | (tmp << (64 - 16)); b2 -= b3 + k3 + t2; b3 -= k4 + 16;
+
             tmp = b3 ^ b0; b3 = (tmp >>> 32) | (tmp << (64 - 32)); b0 -= b3;
             tmp = b1 ^ b2; b1 = (tmp >>> 32) | (tmp << (64 - 32)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 58) | (tmp << (64 - 58)); b0 -= b1;
@@ -468,6 +477,7 @@ public class ThreefishCipher implements BlockCipher {
             tmp = b1 ^ b2; b1 = (tmp >>> 57) | (tmp << (64 - 57)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 14) | (tmp << (64 - 14)); b0 -= b1 + k4; b1 -= k0 + t2;
             tmp = b3 ^ b2; b3 = (tmp >>> 16) | (tmp << (64 - 16)); b2 -= b3 + k1 + t0; b3 -= k2 + 14;
+
             tmp = b3 ^ b0; b3 = (tmp >>> 32) | (tmp << (64 - 32)); b0 -= b3;
             tmp = b1 ^ b2; b1 = (tmp >>> 32) | (tmp << (64 - 32)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 58) | (tmp << (64 - 58)); b0 -= b1;
@@ -484,6 +494,7 @@ public class ThreefishCipher implements BlockCipher {
             tmp = b1 ^ b2; b1 = (tmp >>> 57) | (tmp << (64 - 57)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 14) | (tmp << (64 - 14)); b0 -= b1 + k2; b1 -= k3 + t0;
             tmp = b3 ^ b2; b3 = (tmp >>> 16) | (tmp << (64 - 16)); b2 -= b3 + k4 + t1; b3 -= k0 + 12;
+
             tmp = b3 ^ b0; b3 = (tmp >>> 32) | (tmp << (64 - 32)); b0 -= b3;
             tmp = b1 ^ b2; b1 = (tmp >>> 32) | (tmp << (64 - 32)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 58) | (tmp << (64 - 58)); b0 -= b1;
@@ -500,6 +511,7 @@ public class ThreefishCipher implements BlockCipher {
             tmp = b1 ^ b2; b1 = (tmp >>> 57) | (tmp << (64 - 57)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 14) | (tmp << (64 - 14)); b0 -= b1 + k0; b1 -= k1 + t1;
             tmp = b3 ^ b2; b3 = (tmp >>> 16) | (tmp << (64 - 16)); b2 -= b3 + k2 + t2; b3 -= k3 + 10;
+
             tmp = b3 ^ b0; b3 = (tmp >>> 32) | (tmp << (64 - 32)); b0 -= b3;
             tmp = b1 ^ b2; b1 = (tmp >>> 32) | (tmp << (64 - 32)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 58) | (tmp << (64 - 58)); b0 -= b1;
@@ -516,6 +528,7 @@ public class ThreefishCipher implements BlockCipher {
             tmp = b1 ^ b2; b1 = (tmp >>> 57) | (tmp << (64 - 57)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 14) | (tmp << (64 - 14)); b0 -= b1 + k3; b1 -= k4 + t2;
             tmp = b3 ^ b2; b3 = (tmp >>> 16) | (tmp << (64 - 16)); b2 -= b3 + k0 + t0; b3 -= k1 + 8;
+
             tmp = b3 ^ b0; b3 = (tmp >>> 32) | (tmp << (64 - 32)); b0 -= b3;
             tmp = b1 ^ b2; b1 = (tmp >>> 32) | (tmp << (64 - 32)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 58) | (tmp << (64 - 58)); b0 -= b1;
@@ -532,6 +545,7 @@ public class ThreefishCipher implements BlockCipher {
             tmp = b1 ^ b2; b1 = (tmp >>> 57) | (tmp << (64 - 57)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 14) | (tmp << (64 - 14)); b0 -= b1 + k1; b1 -= k2 + t0;
             tmp = b3 ^ b2; b3 = (tmp >>> 16) | (tmp << (64 - 16)); b2 -= b3 + k3 + t1; b3 -= k4 + 6;
+
             tmp = b3 ^ b0; b3 = (tmp >>> 32) | (tmp << (64 - 32)); b0 -= b3;
             tmp = b1 ^ b2; b1 = (tmp >>> 32) | (tmp << (64 - 32)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 58) | (tmp << (64 - 58)); b0 -= b1;
@@ -548,6 +562,7 @@ public class ThreefishCipher implements BlockCipher {
             tmp = b1 ^ b2; b1 = (tmp >>> 57) | (tmp << (64 - 57)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 14) | (tmp << (64 - 14)); b0 -= b1 + k4; b1 -= k0 + t1;
             tmp = b3 ^ b2; b3 = (tmp >>> 16) | (tmp << (64 - 16)); b2 -= b3 + k1 + t2; b3 -= k2 + 4;
+
             tmp = b3 ^ b0; b3 = (tmp >>> 32) | (tmp << (64 - 32)); b0 -= b3;
             tmp = b1 ^ b2; b1 = (tmp >>> 32) | (tmp << (64 - 32)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 58) | (tmp << (64 - 58)); b0 -= b1;
@@ -564,6 +579,7 @@ public class ThreefishCipher implements BlockCipher {
             tmp = b1 ^ b2; b1 = (tmp >>> 57) | (tmp << (64 - 57)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 14) | (tmp << (64 - 14)); b0 -= b1 + k2; b1 -= k3 + t2;
             tmp = b3 ^ b2; b3 = (tmp >>> 16) | (tmp << (64 - 16)); b2 -= b3 + k4 + t0; b3 -= k0 + 2;
+
             tmp = b3 ^ b0; b3 = (tmp >>> 32) | (tmp << (64 - 32)); b0 -= b3;
             tmp = b1 ^ b2; b1 = (tmp >>> 32) | (tmp << (64 - 32)); b2 -= b1;
             tmp = b1 ^ b0; b1 = (tmp >>> 58) | (tmp << (64 - 58)); b0 -= b1;
