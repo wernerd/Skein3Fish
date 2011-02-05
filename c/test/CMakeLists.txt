@@ -12,10 +12,3 @@ target_link_libraries(skeinTest skein3fish)
 add_executable(skeinBench skeinBench.c)
 target_link_libraries(skeinBench skein3fish)
 
-########### install files ###############
-# None
-
-########### source distribution ########
-# include(SourceDistribution)
-# src_distribution_init()
-# add_src_dist_files(zrtptestMulti.cpp zrtptest.cpp)

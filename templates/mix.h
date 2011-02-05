@@ -23,11 +23,18 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 */
+#if defined FOR_C
+#define ROR >>
+#elif defined FOR_JAVA
+#define ROR >>
+#else
+#error "cannot define ROR"
+#endif
 
-#define Mix(a, b, r)  a += b; b = ((b << r) | (b >>> (64 - r))) ^ a
+#define Mix(a, b, r)  a += b; b = ((b << r) | (b ROR (64 - r))) ^ a
 
-#define Mix5(a, b, r, k0, k1) b += k1; a += b + k0; b = ((b << r) | (b >>> (64 - r))) ^ a
+#define Mix5(a, b, r, k0, k1) b += k1; a += b + k0; b = ((b << r) | (b ROR (64 - r))) ^ a
 
-#define UnMix(a, b, r) tmp = b ^ a; b = (tmp >>> r) | (tmp << (64 - r)); a -= b
+#define UnMix(a, b, r) tmp = b ^ a; b = (tmp ROR r) | (tmp << (64 - r)); a -= b
 
-#define UnMix5(a, b, r, k0, k1) tmp = b ^ a;  b = (tmp >>> r) | (tmp << (64 - r)); a -= b + k0; b -= k1
+#define UnMix5(a, b, r, k0, k1) tmp = b ^ a;  b = (tmp ROR r) | (tmp << (64 - r)); a -= b + k0; b -= k1

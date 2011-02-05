@@ -6,9 +6,9 @@
 
 #include <threefishApi.h>
 
-static uint64_t three_256_00_key[] = { 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L };
+static uint64_t three_256_00_key[] = { 0L, 0L, 0L, 0L };
 
-static uint64_t three_256_00_input[] = { 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L };
+static uint64_t three_256_00_input[] = { 0L, 0L, 0L, 0L };
 
 static uint64_t three_256_00_tweak[] = { 0L, 0L };
 
