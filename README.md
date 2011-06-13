@@ -1,6 +1,6 @@
 # Skein and Threefish Software Suite
 
-This software suite brings you Skein and Threefish functions for Java and C.
+This software suite brings you Skein and Threefish functions for Java, C, and go.
 Some notable features of this software suite are:
 
 * All three state sizes of Skein and Threefish: 256, 512, and 1024 bits
@@ -37,7 +37,7 @@ The C implementation provides a similar functionality as the Java implementation
 
 Currently the Skein implementation uses the Threefish reference implementation not
 the full unrolled version. It is planned to switch to the full unrolled version to
-simplify maintenace and to mave a better software module structure.
+simplify maintenace and to have a better software module structure.
 
 ### A Skein API and its functions.
 
@@ -59,6 +59,12 @@ specific behaviour and possibilities.
 These are the low level functions that deal with Threefisch blocks only.
 Implementations for cipher modes such as ECB, CFB, or CBC may use these 
 functions.
+
+## The _go_ implementation
+
+This implementation also provides the full feature set, thus you may use
+it to produce Skein hashes or Skein MAC. The API is similar to Java
+and uses the same function names as much as possible.
 
 
 ## The Threefish cipher implementation
