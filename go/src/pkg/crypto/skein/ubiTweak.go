@@ -1,15 +1,15 @@
 package skein
 
 const (
-    Key int = 0
-    Config int = 4
+    Key             int = 0
+    Config          int = 4
     Personalization int = 8
-    PublicKey int = 12
-    KeyIdentifier int = 16
-    Nonce int = 20
-    Message int = 48
-    Out int = 63
-    )
+    PublicKey       int = 12
+    KeyIdentifier   int = 16
+    Nonce           int = 20
+    Message         int = 48
+    Out             int = 63
+)
 
 const t1FlagFinal = uint64(1) << 63
 const t1FlagFirst = uint64(1) << 62
@@ -76,7 +76,7 @@ func (u *ubiTweak) setBitPad(value bool) {
         u.tweak[1] &^= t1FlagBitPad
     }
 }
-        
+
 /**
  * Gets  the current tree level.
  */
@@ -102,8 +102,8 @@ func (u *ubiTweak) setTreeLevel(value int) {
  *      Number of processed bytes.
  */
 func (u *ubiTweak) getBitsProcessed() (low, high uint64) {
-    low = u.tweak[0];
-    high = u.tweak[1] & 0xffffffff;
+    low = u.tweak[0]
+    high = u.tweak[1] & 0xffffffff
     return
 }
 
@@ -114,8 +114,8 @@ func (u *ubiTweak) getBitsProcessed() (low, high uint64) {
  *        The number of bits to set - low 64 bits
  */
 func (u *ubiTweak) setBitsProcessed(value uint64) {
-    u.tweak[0] = value;
-    u.tweak[1] &= 0xffffffff00000000;
+    u.tweak[0] = value
+    u.tweak[1] &= 0xffffffff00000000
 }
 
 /**
@@ -130,9 +130,9 @@ func (u *ubiTweak) setBitsProcessed(value uint64) {
 func (u *ubiTweak) addBytesProcessed(value int) {
     const len = 3
     carry := uint64(value)
-            
+
     var words [len]uint64
-    
+
     words[0] = u.tweak[0] & 0xffffffff
     words[1] = (u.tweak[0] >> 32) & 0xffffffff
     words[2] = u.tweak[1] & 0xffffffff
@@ -141,7 +141,7 @@ func (u *ubiTweak) addBytesProcessed(value int) {
         carry += words[i]
         words[i] = carry
         carry >>= 32
-    }        
+    }
     u.tweak[0] = words[0] & 0xffffffff
     u.tweak[0] |= (words[1] & 0xffffffff) << 32
     u.tweak[1] |= words[2] & 0xffffffff

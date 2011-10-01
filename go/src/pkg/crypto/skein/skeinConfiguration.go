@@ -2,11 +2,11 @@ package skein
 
 import (
     "crypto/threefish"
-    )
-    
+)
+
 type skeinConfiguration struct {
     numStateWords int
-    configValue []uint64
+    configValue   []uint64
     // Set the state size for the configuration
     configString []uint64
 }
@@ -14,7 +14,7 @@ type skeinConfiguration struct {
 func newSkeinConfiguration(sk *Skein) *skeinConfiguration {
     s := new(skeinConfiguration)
     s.numStateWords = sk.getNumberCipherStateWords()
-    s.configValue = make([]uint64, s.numStateWords )
+    s.configValue = make([]uint64, s.numStateWords)
     s.configString = make([]uint64, s.numStateWords)
     s.configString[1] = uint64(sk.getHashSize())
     return s
@@ -29,7 +29,7 @@ func (c *skeinConfiguration) generateConfiguration() {
     tweak.setFinalBlock(true)
     tweak.setBitsProcessed(32)
 
-    cipher, _ := threefish.NewSize(c.numStateWords*64)
+    cipher, _ := threefish.NewSize(c.numStateWords * 64)
     cipher.SetTweak(tweak.getTweak())
     cipher.Encrypt64(c.configValue, c.configString)
 
@@ -55,19 +55,19 @@ func (c *skeinConfiguration) generateConfigurationState(initialState []uint64) {
     c.configValue[2] ^= c.configString[2]
 }
 
-func (c *skeinConfiguration) setSchema(schema [] byte) {
+func (c *skeinConfiguration) setSchema(schema []byte) {
 
-    n := c.configString[0];
+    n := c.configString[0]
 
     // Clear the schema bytes
-    n &^= 0xffffffff;
+    n &^= 0xffffffff
     // Set schema bytes
     n = uint64(schema[3]) << 24
     n |= uint64(schema[2]) << 16
     n |= uint64(schema[1]) << 8
     n |= uint64(schema[0])
 
-    c.configString[0] = n;
+    c.configString[0] = n
 }
 
 func (c *skeinConfiguration) setVersion(version int) {

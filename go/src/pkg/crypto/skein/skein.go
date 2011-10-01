@@ -20,47 +20,50 @@ import (
     "strconv"
     "crypto/threefish"
     "encoding/binary"
-    )
+)
 
-var schema = [4]byte{ 83, 72, 65, 51 } // "SHA3"
+var schema = [4]byte{83, 72, 65, 51} // "SHA3"
 
-const (normal = iota
+const (
+    normal = iota
     zeroedState
     chainedState
     chainedConfig
-    )
+)
 
 const (
-    Skein256 = 256
-    Skein512 = 512
+    Skein256  = 256
+    Skein512  = 512
     Skein1024 = 1024
-    )
+)
 
 const (
     maxSkeinStateWords = Skein1024 / 64
-    )
-    
+)
+
 var nullStateWords [maxSkeinStateWords]uint64
 
 type Skein struct {
     cipherStateWords,
     outputBytes,
-    hashSize, 
+    hashSize,
     bytesFilled int
-    config *skeinConfiguration
-    cipher *threefish.Cipher
+    config        *skeinConfiguration
+    cipher        *threefish.Cipher
     ubiParameters *ubiTweak
-    inputBuffer []byte
-    cipherInput []uint64
-    state []uint64
+    inputBuffer   []byte
+    cipherInput   []uint64
+    state         []uint64
 }
 
 type stateSizeError int
+
 func (s stateSizeError) String() string {
     return "crypto/skein: invalid Skein state size " + strconv.Itoa(int(s))
 }
 
 type outputSizeError int
+
 func (s outputSizeError) String() string {
     return "crypto/skein: invalid Skein output size " + strconv.Itoa(int(s))
 }
@@ -74,7 +77,7 @@ func (s outputSizeError) String() string {
 //     The output size of the hash in bits. Output size must greater 
 //     than zero.
 //
-func New (stateSize, outputSize int) (*Skein, os.Error) {
+func New(stateSize, outputSize int) (*Skein, os.Error) {
     if stateSize != 256 && stateSize != 512 && stateSize != 1024 {
         return nil, stateSizeError(stateSize)
     }
@@ -104,7 +107,7 @@ func New (stateSize, outputSize int) (*Skein, os.Error) {
 // key
 //     The key for a message authenication code (MAC)
 //
-func NewExtended (stateSize, outputSize, treeInfo int, key []byte) (*Skein, os.Error) {
+func NewExtended(stateSize, outputSize, treeInfo int, key []byte) (*Skein, os.Error) {
     if stateSize != 256 && stateSize != 512 && stateSize != 1024 {
         return nil, stateSizeError(stateSize)
     }
@@ -114,13 +117,13 @@ func NewExtended (stateSize, outputSize, treeInfo int, key []byte) (*Skein, os.E
     s := new(Skein)
     s.setup(stateSize, outputSize)
     // compute the initial chaining state values, based on key
-    if len(key) > 0 {               // do we have a key?
+    if len(key) > 0 { // do we have a key?
         s.outputBytes = s.cipherStateWords * 8
         s.ubiParameters.startNewBlockType(uint64(Key))
-        s.Update(key)               // hash the key
-        s.finalPad()                // computes new Skein state
+        s.Update(key) // hash the key
+        s.finalPad()  // computes new Skein state
     }
-    s.outputBytes = (outputSize + 7) / 8  // re-compute here
+    s.outputBytes = (outputSize + 7) / 8 // re-compute here
     s.config = newSkeinConfiguration(s)
     s.config.setSchema(schema[:]) // "SHA3"
     s.config.setVersion(1)
@@ -142,7 +145,7 @@ func (s *Skein) setup(stateSize, outputSize int) {
     s.cipher, _ = threefish.NewSize(stateSize)
 
     // Allocate buffers
-    s.inputBuffer = make([]byte, s.cipherStateWords * 8)
+    s.inputBuffer = make([]byte, s.cipherStateWords*8)
     s.cipherInput = make([]uint64, s.cipherStateWords)
     s.state = make([]uint64, s.cipherStateWords)
 
@@ -192,9 +195,9 @@ func (s *Skein) initialize() {
 func (s *Skein) initializeConf(initializationType int) {
     switch initializationType {
     case normal:
-        s.initialize()                      // Normal initialization
+        s.initialize() // Normal initialization
     case zeroedState:
-        copy(s.state, nullStateWords[:])    // Start with a all zero state
+        copy(s.state, nullStateWords[:]) // Start with a all zero state
     case chainedState:
         // Keep the state as it is and do nothing
     case chainedConfig:
@@ -209,8 +212,8 @@ func (s *Skein) initializeConf(initializationType int) {
 // context variables. 
 //
 func (s *Skein) processBlock(bytes int) {
-    s.cipher.SetKey(s.state)                        // state is the key
-    s.ubiParameters.addBytesProcessed(bytes)        // Update tweak
+    s.cipher.SetKey(s.state)                 // state is the key
+    s.ubiParameters.addBytesProcessed(bytes) // Update tweak
     s.cipher.SetTweak(s.ubiParameters.getTweak())
 
     s.cipher.Encrypt64(s.state, s.cipherInput)
@@ -221,11 +224,13 @@ func (s *Skein) processBlock(bytes int) {
 }
 
 type statusError int
+
 func (s statusError) String() string {
     return "crypto/skein: partial byte only on last data block"
 }
 
 type lengthError int
+
 func (s lengthError) String() string {
     return "crypto/skein: length of input buffer does not match bit length: " + strconv.Itoa(int(s))
 }
@@ -242,7 +247,7 @@ func (s lengthError) String() string {
 //     Number of bits to hash.
 //
 func (s *Skein) UpdateBits(input []byte, numBits int) os.Error {
-        
+
     if s.ubiParameters.isBitPad() {
         return statusError(0)
     }
@@ -256,8 +261,8 @@ func (s *Skein) UpdateBits(input []byte, numBits int) os.Error {
         return nil
     }
     // Mask partial byte and set BitPad flag before doFinal()
-    mask := byte(1 << (7 - uint(numBits & 7)))      // partial byte bit mask
-    s.inputBuffer[s.bytesFilled-1] = byte((s.inputBuffer[s.bytesFilled-1] & (0-mask)) | mask)
+    mask := byte(1 << (7 - uint(numBits&7))) // partial byte bit mask
+    s.inputBuffer[s.bytesFilled-1] = byte((s.inputBuffer[s.bytesFilled-1] & (0 - mask)) | mask)
     s.ubiParameters.setBitPad(true)
     return nil
 }
@@ -272,10 +277,10 @@ func (s *Skein) Update(input []byte) {
     // Fill input buffer
     for i := 0; i < len(input); i++ {
         // Do a transform if the input buffer is filled
-        if s.bytesFilled == s.cipherStateWords * 8 {
+        if s.bytesFilled == s.cipherStateWords*8 {
             // Copy input buffer to cipher input buffer
             for i := 0; i < s.cipherStateWords; i++ {
-                s.cipherInput[i] = binary.LittleEndian.Uint64(s.inputBuffer[i*8:i*8+8])
+                s.cipherInput[i] = binary.LittleEndian.Uint64(s.inputBuffer[i*8 : i*8+8])
             }
             // Process the block
             s.processBlock(s.bytesFilled)
@@ -305,7 +310,7 @@ func (s *Skein) DoFinal() (hash []byte) {
         s.inputBuffer[i] = 0
     }
     for i := 0; i < s.cipherStateWords; i++ {
-        s.cipherInput[i] = binary.LittleEndian.Uint64(s.inputBuffer[i*8:i*8+8])
+        s.cipherInput[i] = binary.LittleEndian.Uint64(s.inputBuffer[i*8 : i*8+8])
     }
     // Do final message block
     s.ubiParameters.setFinalBlock(true)
@@ -329,14 +334,14 @@ func (s *Skein) DoFinal() (hash []byte) {
         if outputSize > stateBytes {
             outputSize = stateBytes
         }
-        s.putBytes(s.state, hash[i : i+outputSize])
+        s.putBytes(s.state, hash[i:i+outputSize])
         // Restore old state
         copy(s.state, oldState)
         // Increment counter
         s.cipherInput[0]++
-     }
-     s.Reset()
-     return
+    }
+    s.Reset()
+    return
 }
 
 // Return the Skein output hash size as number of bits
@@ -357,7 +362,7 @@ func (s *Skein) Reset() {
 // and returns the resulting data. Used during set-up of
 // MAC key hash.
 //
-func (s *Skein) finalPad(){
+func (s *Skein) finalPad() {
 
     // Pad left over space in input buffer with zeros
     // and copy to cipher input buffer
@@ -365,7 +370,7 @@ func (s *Skein) finalPad(){
         s.inputBuffer[i] = 0
     }
     for i := 0; i < s.cipherStateWords; i++ {
-        s.cipherInput[i] = binary.LittleEndian.Uint64(s.inputBuffer[i*8:i*8+8])
+        s.cipherInput[i] = binary.LittleEndian.Uint64(s.inputBuffer[i*8 : i*8+8])
     }
     // Do final message block
     s.ubiParameters.setFinalBlock(true)
@@ -388,11 +393,3 @@ func (s *Skein) putBytes(input []uint64, output []byte) {
         j = (j + 8) & 63
     }
 }
-
-
-
-
-
-
-
-

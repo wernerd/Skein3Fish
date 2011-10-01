@@ -2,9 +2,10 @@ package skein
 
 import (
     "os"
-    )
+)
+
 type SkeinMac struct {
-    skein *Skein
+    skein     *Skein
     stateSave []uint64
 }
 
