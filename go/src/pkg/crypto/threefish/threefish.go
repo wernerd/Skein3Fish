@@ -7,18 +7,17 @@
 package threefish
 
 import (
-	"os"
-	"strconv"
-	"encoding/binary"
+    "os"
+    "strconv"
+    "encoding/binary"
 )
 
 // General Threefish constants
 //
 const (
-    KEY_SCHEDULE_CONST = uint64(0x1BD11BDAA9FC1A22)
+    KEY_SCHEDULE_CONST  = uint64(0x1BD11BDAA9FC1A22)
     EXPANDED_TWEAK_SIZE = 3
 )
-
 
 // Internal interface to simplify Threefish usage
 //
@@ -32,7 +31,7 @@ type cipherInternal interface {
     // output
     //     The ciphertext output.
     //
-    encrypt(input, output [] uint64)
+    encrypt(input, output []uint64)
 
     // Decrypt function
     // 
@@ -44,24 +43,23 @@ type cipherInternal interface {
     //     The plaintext output.
     //
     decrypt(input, output []uint64)
-    
+
     getTempData() ([]uint64, []uint64)
     setTweak(tweak []uint64)
     setKey(key []uint64)
 }
 
-
 // A Cipher is an instance of Threefish using a particular key and state size.
 //
 type Cipher struct {
-	stateSize int
-	cipherInternal
+    stateSize int
+    cipherInternal
 }
 
 type KeySizeError int
 
 func (k KeySizeError) String() string {
-	return "crypto/threefish: invalid key size " + strconv.Itoa(int(k))
+    return "crypto/threefish: invalid key size " + strconv.Itoa(int(k))
 }
 
 // NewCipher creates and returns a Cipher.
@@ -83,7 +81,7 @@ func New(key []byte, tweak []uint64) (*Cipher, os.Error) {
         internal, err = newThreefish1024(key, tweak)
     default:
         return nil, KeySizeError(len(key))
-    }		
+    }
     return &Cipher{len(key) * 8, internal}, err
 }
 
@@ -106,7 +104,7 @@ func New64(key, tweak []uint64) (*Cipher, os.Error) {
         internal, err = newThreefish1024_64(key, tweak)
     default:
         return nil, KeySizeError(len(key))
-    }       
+    }
     return &Cipher{len(key) * 8, internal}, err
 }
 
@@ -118,7 +116,7 @@ func New64(key, tweak []uint64) (*Cipher, os.Error) {
 func NewSize(size int) (*Cipher, os.Error) {
     var err os.Error
     var internal cipherInternal
-        
+
     switch size {
     case 256:
         internal, err = newThreefish256(nil, nil)
@@ -128,7 +126,7 @@ func NewSize(size int) (*Cipher, os.Error) {
         internal, err = newThreefish1024(nil, nil)
     default:
         return nil, KeySizeError(size)
-    }       
+    }
     return &Cipher{size, internal}, err
 }
 
@@ -147,9 +145,9 @@ func (c *Cipher) Encrypt(dst, src []byte) {
 
     // This saves makes
     tmpin, tmpout := c.getTempData()
-    
+
     for i := 0; i < uintLen; i++ {
-        tmpin[i] = binary.LittleEndian.Uint64(src[i*8:i*8+8])
+        tmpin[i] = binary.LittleEndian.Uint64(src[i*8 : i*8+8])
     }
     c.encrypt(tmpin, tmpout)
 
@@ -164,12 +162,12 @@ func (c *Cipher) Encrypt(dst, src []byte) {
 func (c *Cipher) Decrypt(dst, src []byte) {
 
     uintLen := c.stateSize / 64
-    
+
     // This saves a make
     tmpin, tmpout := c.getTempData()
-    
+
     for i := 0; i < uintLen; i++ {
-        tmpin[i] = binary.LittleEndian.Uint64(src[i*8:i*8+8])
+        tmpin[i] = binary.LittleEndian.Uint64(src[i*8 : i*8+8])
     }
     c.decrypt(tmpin, tmpout)
 
@@ -223,7 +221,7 @@ func setKey(key, expKey []uint64) {
     var i int
     parity := uint64(KEY_SCHEDULE_CONST)
 
-    for i = 0; i < len(expKey) - 1; i++ {
+    for i = 0; i < len(expKey)-1; i++ {
         expKey[i] = key[i]
         parity ^= key[i]
     }
