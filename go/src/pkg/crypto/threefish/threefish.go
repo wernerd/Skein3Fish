@@ -1,4 +1,4 @@
-// This package implement the Threefish cipher as specified in the Skein V1.3
+// This package implements the Threefish cipher as specified in the Skein V1.3
 // specification. The Skein digest algorithm uses Threefish to generate
 // the digests.
 //

@@ -118,7 +118,7 @@ type katScanner struct {
 }
 
 func newKatScanner(name string) *katScanner {
-    r, e := os.Open(name, os.O_RDONLY, 0)
+    r, e := os.Open(name)
     if e != nil {
         fmt.Printf("File open error: %s\n", e)
         return nil
