@@ -1,23 +1,41 @@
-/*
-This package implements the Skein hash and Skein MAC algorithms as defined
-if the Skein V1.3 specification. Skein is one of the five SHA-3 candidate 
-algorithms that advance to the third (and final) round of the SHA-3
-selection.
+// Copyright (C) 2011 Werner Dittmann
+// 
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
+//
 
-The implementation in this package supports:
-	- All three state sizes of Skein and Threefish: 256, 512, and 1024 bits
-	- Skein MAC
-	- Variable length of hash and MAC input and output - even in numbers of bits
-	- Full message length as defined in the Skein paper (2^96 -1 bytes, not just a meager 4 GiB :-) )
-	- Tested with the official test vectors that are part of the NIST CD (except Tree hashes)
+// This package implements the Skein hash and Skein MAC algorithms as defined
+// if the Skein V1.3 specification. Skein is one of the five SHA-3 candidate 
+// algorithms that advance to the third (and final) round of the SHA-3
+// selection.
+//
+// The implementation in this package supports:
+//    - All three state sizes of Skein and Threefish: 256, 512, and 1024 bits
+//    - Skein MAC
+//    - Variable length of hash and MAC input and output - even in numbers of bits
+//    - Full message length as defined in the Skein paper (2^96 -1 bytes, not just a meager 4 GiB :-) )
+//    - Tested with the official test vectors that are part of the NIST CD (except Tree hashes)
+//
+// The implementation does not support tree hashing.
 
-The implementation does not support tree hashing.
-*/
 package skein
 
 import (
     "os"
     "strconv"
+    "hash"
     "crypto/threefish"
     "encoding/binary"
 )
@@ -66,6 +84,53 @@ type outputSizeError int
 
 func (s outputSizeError) String() string {
     return "crypto/skein: invalid Skein output size " + strconv.Itoa(int(s))
+}
+
+// Convenience functions to make it easier to create new hashes
+
+// Create a new Skein hash instance - 256bit (32 byte) hash size.
+// This Skein hash uses the 512bit state length
+//
+func New256() hash.Hash {
+    h, _ := New(Skein512, 256) // Ignore error - we use correct sizes here
+    return h
+}
+
+// The following section implement the hash.Hash interface methods
+
+// Reset resets the hash to one with zero bytes written.
+func (s *Skein) Reset() {
+    s.initialize()
+}
+
+// Size return the hash size in bytes if the hash size measured in bits is a multiple of 8.
+//
+// If the bit size is not a multiple of 8 then Size returns 0.
+// 
+func (s *Skein) Size() int {
+    i := s.getHashSize()
+    if (i & 0x7) != 0 {
+        return 0
+    }
+    return i / 8
+}
+
+// Write adds more data to the current hash.
+// It never returns an error.
+//
+// In this implementation it's just a thin wrapper and calls Update()
+//
+func (s *Skein) Write(p []byte) (nn int, err os.Error) {
+    s.Update(p)
+    nn = len(p)
+    return
+}
+
+// Sum returns the current hash, without changing the
+// underlying hash state.
+// TODO: discuss if this makes sense for Skein - Skein works with 64bit int internally
+func (s *Skein) Sum() []byte {
+    return s.finalIntern()
 }
 
 // Initializes the Skein hash instance.
@@ -217,6 +282,7 @@ func (s *Skein) processBlock(bytes int) {
     s.cipher.SetTweak(s.ubiParameters.getTweak())
 
     s.cipher.Encrypt64(s.state, s.cipherInput)
+
     // Feed-forward input with state
     for i := 0; i < len(s.cipherInput); i++ {
         s.state[i] ^= s.cipherInput[i]
@@ -303,7 +369,12 @@ func (s *Skein) Update(input []byte) {
 // application may reuse this Skein context to compute another digest.
 //
 func (s *Skein) DoFinal() (hash []byte) {
+    hash = s.finalIntern()
+    s.Reset()
+    return
+}
 
+func (s *Skein) finalIntern() (hash []byte) {
     // Pad left over space in input buffer with zeros
     // and copy to cipher input buffer
     for i := s.bytesFilled; i < len(s.inputBuffer); i++ {
@@ -321,6 +392,8 @@ func (s *Skein) DoFinal() (hash []byte) {
 
     hash = make([]byte, s.outputBytes)
     oldState := make([]uint64, s.cipherStateWords)
+
+    // Save current state of hash, we need this to compute the output hash
     copy(oldState, s.state)
 
     stateBytes := s.cipherStateWords * 8
@@ -334,13 +407,17 @@ func (s *Skein) DoFinal() (hash []byte) {
         if outputSize > stateBytes {
             outputSize = stateBytes
         }
+
+        // The new state create by processBlock() is (part of) the hash
         s.putBytes(s.state, hash[i:i+outputSize])
-        // Restore old state
+
+        // Restore current state of hash to compute next hash output
         copy(s.state, oldState)
-        // Increment counter
+
+        // Increment counter, Skein performs a Counter Mode threefish to compute hash output
         s.cipherInput[0]++
     }
-    s.Reset()
+    // at this point the internal state (s.state) is unchanged
     return
 }
 
@@ -352,10 +429,6 @@ func (s *Skein) getHashSize() int {
 // Return the number of Skein state words
 func (s *Skein) getNumberCipherStateWords() int {
     return s.cipherStateWords
-}
-
-func (s *Skein) Reset() {
-    s.initialize()
 }
 
 // Internal function that performs a final block processing
