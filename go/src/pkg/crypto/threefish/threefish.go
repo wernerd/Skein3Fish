@@ -1,3 +1,21 @@
+// Copyright (C) 2011 Werner Dittmann
+// 
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
+//
+
 // This package implements the Threefish cipher as specified in the Skein V1.3
 // specification. The Skein digest algorithm uses Threefish to generate
 // the digests.
@@ -68,6 +86,11 @@ func (k KeySizeError) String() string {
 // state size. The blocksize is the same as the key length (state size).
 // The tweak is a uint64 array with two elements.
 //
+// key
+//      Key data, key length selects the internal state size
+// tweak
+//      The initial Tweak data for this threefish instance
+//
 func New(key []byte, tweak []uint64) (*Cipher, os.Error) {
     var err os.Error
     var internal cipherInternal
@@ -90,6 +113,11 @@ func New(key []byte, tweak []uint64) (*Cipher, os.Error) {
 // The key is a uint64 array of 4, 8 or 16 elements. The key length must match the
 // Threefish state size. The blocksize is the same as the key length (state size).
 // The tweak is a uint64 array with two elements.
+//
+// key
+//      Key data, key length selects the internal state size
+// tweak
+//      The initial Tweak data for this threefish instance
 //
 func New64(key, tweak []uint64) (*Cipher, os.Error) {
     var err os.Error
@@ -136,8 +164,13 @@ func (c *Cipher) BlockSize() int {
     return c.stateSize / 8
 }
 
-// Encrypt encrypts the first block in src into dst.
+// Encrypt a block.
 // Dst and src may point at the same memory.
+//
+// dst
+//      Destination of encypted data (cipher data)
+// src
+//      Contains a block of plain data
 //
 func (c *Cipher) Encrypt(dst, src []byte) {
 
@@ -156,14 +189,19 @@ func (c *Cipher) Encrypt(dst, src []byte) {
     }
 }
 
-// Decrypt decrypts the first block in src into dst.
+// Decrypt a block.
 // Dst and src may point at the same memory.
+//
+// dst
+//      Destination of encypted data (cipher data)
+// src
+//      Contains a block of plain data
 //
 func (c *Cipher) Decrypt(dst, src []byte) {
 
     uintLen := c.stateSize / 64
 
-    // This saves a make
+    // This saves a make because tmpin and tmpout are of variable length
     tmpin, tmpout := c.getTempData()
 
     for i := 0; i < uintLen; i++ {
@@ -176,17 +214,27 @@ func (c *Cipher) Decrypt(dst, src []byte) {
     }
 }
 
-// Encrypt encrypts the first block in src into dst, blocks
-// are unit64 arrays.
+// Encrypt a block.
+// Blocks are unit64 arrays.
 // Dst and src may point at the same memory.
+//
+// dst
+//      Destination of encypted data (cipher data)
+// src
+//      Contains a block of plain data
 //
 func (c *Cipher) Encrypt64(dst, src []uint64) {
     c.encrypt(src, dst)
 }
 
-// Decrypt encrypts the first block in src into dst, blocks
-// are unit64 arrays.
+// Decrypt a block.
+// Blocks are unit64 arrays.
 // Dst and src may point at the same memory.
+//
+// dst
+//      Destination of decrypted data (plain data)
+// src
+//      Contains a block of encrypted data (cipher data)
 //
 func (c *Cipher) Decrypt64(dst, src []uint64) {
     c.decrypt(src, dst)
@@ -209,21 +257,21 @@ func (c *Cipher) SetKey(key []uint64) {
 }
 
 // Some helper functions available for all Threefish* implementations
-func setTweak(tweak, expTweak []uint64) {
+func setTweak(tweak, expandedTweak []uint64) {
     if tweak != nil {
-        expTweak[0] = tweak[0]
-        expTweak[1] = tweak[1]
-        expTweak[2] = tweak[0] ^ tweak[1]
+        expandedTweak[0] = tweak[0]
+        expandedTweak[1] = tweak[1]
+        expandedTweak[2] = tweak[0] ^ tweak[1]
     }
 }
 
-func setKey(key, expKey []uint64) {
+func setKey(key, expandedKey []uint64) {
     var i int
     parity := uint64(KEY_SCHEDULE_CONST)
 
-    for i = 0; i < len(expKey)-1; i++ {
-        expKey[i] = key[i]
+    for i = 0; i < len(expandedKey)-1; i++ {
+        expandedKey[i] = key[i]
         parity ^= key[i]
     }
-    expKey[i] = parity
+    expandedKey[i] = parity
 }
