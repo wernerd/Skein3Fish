@@ -29,11 +29,9 @@
 //    - Tested with the official test vectors that are part of the NIST CD (except Tree hashes)
 //
 // The implementation does not support tree hashing.
-
 package skein
 
 import (
-    "os"
     "strconv"
     "hash"
     "crypto/threefish"
@@ -76,13 +74,13 @@ type Skein struct {
 
 type stateSizeError int
 
-func (s stateSizeError) String() string {
+func (s stateSizeError) Error() string {
     return "crypto/skein: invalid Skein state size " + strconv.Itoa(int(s))
 }
 
 type outputSizeError int
 
-func (s outputSizeError) String() string {
+func (s outputSizeError) Error() string {
     return "crypto/skein: invalid Skein output size " + strconv.Itoa(int(s))
 }
 
@@ -120,7 +118,7 @@ func (s *Skein) Size() int {
 //
 // In this implementation it's just a thin wrapper and calls Update()
 //
-func (s *Skein) Write(p []byte) (nn int, err os.Error) {
+func (s *Skein) Write(p []byte) (nn int, err error) {
     s.Update(p)
     nn = len(p)
     return
@@ -129,7 +127,7 @@ func (s *Skein) Write(p []byte) (nn int, err os.Error) {
 // Sum returns the current hash, without changing the
 // underlying hash state.
 // TODO: discuss if this makes sense for Skein - Skein works with 64bit int internally
-func (s *Skein) Sum() []byte {
+func (s *Skein) Sum(b []byte) []byte {
     return s.finalIntern()
 }
 
@@ -142,7 +140,7 @@ func (s *Skein) Sum() []byte {
 //     The output size of the hash in bits. Output size must greater 
 //     than zero.
 //
-func New(stateSize, outputSize int) (*Skein, os.Error) {
+func New(stateSize, outputSize int) (*Skein, error) {
     if stateSize != 256 && stateSize != 512 && stateSize != 1024 {
         return nil, stateSizeError(stateSize)
     }
@@ -172,7 +170,7 @@ func New(stateSize, outputSize int) (*Skein, os.Error) {
 // key
 //     The key for a message authenication code (MAC)
 //
-func NewExtended(stateSize, outputSize, treeInfo int, key []byte) (*Skein, os.Error) {
+func NewExtended(stateSize, outputSize, treeInfo int, key []byte) (*Skein, error) {
     if stateSize != 256 && stateSize != 512 && stateSize != 1024 {
         return nil, stateSizeError(stateSize)
     }
@@ -291,13 +289,13 @@ func (s *Skein) processBlock(bytes int) {
 
 type statusError int
 
-func (s statusError) String() string {
+func (s statusError) Error() string {
     return "crypto/skein: partial byte only on last data block"
 }
 
 type lengthError int
 
-func (s lengthError) String() string {
+func (s lengthError) Error() string {
     return "crypto/skein: length of input buffer does not match bit length: " + strconv.Itoa(int(s))
 }
 
@@ -312,7 +310,7 @@ func (s lengthError) String() string {
 // numBits
 //     Number of bits to hash.
 //
-func (s *Skein) UpdateBits(input []byte, numBits int) os.Error {
+func (s *Skein) UpdateBits(input []byte, numBits int) error {
 
     if s.ubiParameters.isBitPad() {
         return statusError(0)

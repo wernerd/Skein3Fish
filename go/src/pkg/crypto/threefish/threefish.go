@@ -25,7 +25,6 @@
 package threefish
 
 import (
-    "os"
     "strconv"
     "encoding/binary"
 )
@@ -76,7 +75,7 @@ type Cipher struct {
 
 type KeySizeError int
 
-func (k KeySizeError) String() string {
+func (k KeySizeError) Error() string {
     return "crypto/threefish: invalid key size " + strconv.Itoa(int(k))
 }
 
@@ -91,8 +90,8 @@ func (k KeySizeError) String() string {
 // tweak
 //      The initial Tweak data for this threefish instance
 //
-func New(key []byte, tweak []uint64) (*Cipher, os.Error) {
-    var err os.Error
+func New(key []byte, tweak []uint64) (*Cipher, error) {
+    var err error
     var internal cipherInternal
 
     switch len(key) {
@@ -119,8 +118,8 @@ func New(key []byte, tweak []uint64) (*Cipher, os.Error) {
 // tweak
 //      The initial Tweak data for this threefish instance
 //
-func New64(key, tweak []uint64) (*Cipher, os.Error) {
-    var err os.Error
+func New64(key, tweak []uint64) (*Cipher, error) {
+    var err error
     var internal cipherInternal
 
     switch len(key) {
@@ -141,8 +140,8 @@ func New64(key, tweak []uint64) (*Cipher, os.Error) {
 // The size argument is the requested Threefish state size
 // which is also the key and block size. Supported sizes see constants section.
 //
-func NewSize(size int) (*Cipher, os.Error) {
-    var err os.Error
+func NewSize(size int) (*Cipher, error) {
+    var err error
     var internal cipherInternal
 
     switch size {

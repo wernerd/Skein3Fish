@@ -17,10 +17,6 @@
 //
 package skein
 
-import (
-    "os"
-)
-
 type SkeinMac struct {
     skein     *Skein
     stateSave []uint64
@@ -42,7 +38,7 @@ type SkeinMac struct {
 // key
 //     The key bytes
 //
-func NewMac(stateSize, outputSize int, key []byte) (s *SkeinMac, err os.Error) {
+func NewMac(stateSize, outputSize int, key []byte) (s *SkeinMac, err error) {
     s = new(SkeinMac)
     s.skein, err = NewExtended(stateSize, outputSize, 0, key)
     if err != nil {
@@ -73,7 +69,7 @@ func (s *SkeinMac) Update(input []byte) {
 // numBits
 //      Number of bits to hash.
 //
-func (s *SkeinMac) UpdateBits(input []byte, numBits int) os.Error {
+func (s *SkeinMac) UpdateBits(input []byte, numBits int) error {
     return s.skein.UpdateBits(input, numBits)
 }
 

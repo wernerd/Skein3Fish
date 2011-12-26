@@ -18,7 +18,6 @@
 package threefish
 
 import (
-    "os"
     "encoding/binary"
 )
 
@@ -37,7 +36,7 @@ type threefish1024 struct {
 }
 
 // Get an initialized Threefish1024 structure
-func newThreefish1024(key []byte, tweak []uint64) (*threefish1024, os.Error) {
+func newThreefish1024(key []byte, tweak []uint64) (*threefish1024, error) {
     c := new(threefish1024)
 
     // Initialize tweak 
@@ -57,7 +56,7 @@ func newThreefish1024(key []byte, tweak []uint64) (*threefish1024, os.Error) {
 }
 
 // Get an initialized Threefish1024 structure
-func newThreefish1024_64(key, tweak []uint64) (*threefish1024, os.Error) {
+func newThreefish1024_64(key, tweak []uint64) (*threefish1024, error) {
     c := new(threefish1024)
 
     // Initialize tweak 
