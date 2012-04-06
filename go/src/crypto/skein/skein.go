@@ -32,7 +32,7 @@
 package skein
 
 import (
-    "strconv"
+    "strconv" 
     "hash"
     "crypto/threefish"
     "encoding/binary"
@@ -130,6 +130,14 @@ func (s *Skein) Write(p []byte) (nn int, err error) {
 func (s *Skein) Sum(b []byte) []byte {
     return s.finalIntern()
 }
+
+// BlockSize returns the hash's underlying block size.
+// The Write method must be able to accept any amount
+// of data, but it may operate more efficiently if all writes
+// are a multiple of the block size.
+func (s *Skein) BlockSize() int {
+    return s.getHashSize() / 8
+} 
 
 // Initializes the Skein hash instance.
 //
@@ -373,7 +381,7 @@ func (s *Skein) DoFinal() (hash []byte) {
 }
 
 func (s *Skein) finalIntern() (hash []byte) {
-    // Pad left over space in input buffer with zeros
+    // Pad leftover space in input buffer with zeros
     // and copy to cipher input buffer
     for i := s.bytesFilled; i < len(s.inputBuffer); i++ {
         s.inputBuffer[i] = 0

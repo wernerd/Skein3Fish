@@ -88,7 +88,7 @@ func checkKATVectors(ks *katScanner) bool {
 }
 
 func setUp() *katScanner {
-    scanner := newKatScanner("../../../data/skein_golden_kat.txt");
+    scanner := newKatScanner("../data/skein_golden_kat.txt");
     if scanner == nil {
         return nil
     }
