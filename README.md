@@ -12,32 +12,35 @@ Some notable features of this software suite are:
   use for Java programmers.
 * The C API follows in general the lower level openSSL model  
 
-I used some open source and public domain sources to implement and compile this suite. Most
-notably are the Skein C reference and Skein C optimized implementations of the Skein team and
-a very well written C# implementation from Alberto Fajardo. 
+I used some open source and public domain sources to implement and compile
+this suite. Most notably are the Skein C reference and Skein C optimized
+implementations of the Skein team and a very well written C# implementation
+from Alberto Fajardo.
 
 ## The Java implementation
 
-The Skein and Threefish functions for Java a fairly complete and tested and could be used
-in productive environments. The `ant` build file produces a small `jar` file that contains the
-Skein, Threefish, and some other useful and often needed algorithms. 
+The Skein and Threefish functions for Java a fairly complete and tested and
+could be used in productive environments. The `ant` build file produces a
+small `jar` file that contains the Skein, Threefish, and some other useful and
+often needed algorithms.
 
-The Java implementation is a derivation (in parts a large derivation) of Alberto Fajardo's
-C# implementation for .Net. Some Java specific programming tricks to deal with unsigned data
-types were necessary (Java does not support unsigned data types). Also Java misses `ref`
-parameters in function calls.
+The Java implementation is a derivation (in parts a large derivation) of
+Alberto Fajardo's C# implementation for .Net. Some Java specific programming
+tricks to deal with unsigned data types were necessary (Java does not support
+unsigned data types). Also Java misses `ref` parameters in function calls.
 
-Because I'm familiar with the Bouncy Castle crypto library I decided to design the Java interface
-along the lines of BouncyCastle's lightweight crypto API. 
+Because I'm familiar with the Bouncy Castle crypto library I decided to design
+the Java interface along the lines of BouncyCastle's lightweight crypto API.
  
  
 ## The C implementation
 
-The C implementation provides a similar functionality as the Java implementation.
+The C implementation provides a similar functionality as the Java
+implementation.
 
-Currently the Skein implementation uses the Threefish reference implementation not
-the full unrolled version. It is planned to switch to the full unrolled version to
-simplify maintenace and to have a better software module structure.
+Currently the Skein implementation uses the Threefish reference implementation
+not the full unrolled version. It is planned to switch to the full unrolled
+version to simplify maintenace and to have a better software module structure.
 
 ### A Skein API and its functions.
 
@@ -60,23 +63,46 @@ These are the low level functions that deal with Threefisch blocks only.
 Implementations for cipher modes such as ECB, CFB, or CBC may use these 
 functions.
 
-## The _go_ implementation
+## The _Go_ implementation
 
 This implementation also provides the full feature set, thus you may use
 it to produce Skein hashes or Skein MAC. The API is similar to Java
 and uses the same function names as much as possible.
 
+### Download and installation instructions for the _Go_ package
+
+Because this is a multi-language implementation it would be tricky to use the
+standard way to get and install the Go Skein packages. Nevertheless, it's
+quite simple to get and install the Skein package.
+
+I assume that you have already setup your _Go_ environment and know how to use
+the _go_ command.
+
+1. Clone the complete Git repository
+2. change in the `go` subdirectory inside the repository directory
+3. Set the GOPATH environment variable to include the current path, for
+   example: ``export GOPATH=`pwd` ``
+4. run the Go commands:
+    * go install crypto/threefish
+    * go install crypto/skein
+    * go test crypto/threefish
+    * go test crypto/skein
+
+The `test` commands should run without problems and should not report any
+error.
 
 ## The Threefish cipher implementation
 
-Alberto did a wonderfull job here. In his implementation he unrolled all three Threefish
-algorithms (256, 512, 1024).The Java implementatiom also has unrolled Threefish algorithms
-that are even faster than Alberto's C# implementation. This happens because Java has all 
-the code really unrolled. The C# implementation uses a lot of function calls with `ref` 
-parameters. This unrolled code gives the Java JIT compiler good input for optimization.
+Alberto did a wonderfull job here. In his implementation he unrolled all three
+Threefish algorithms (256, 512, 1024).The Java implementatiom also has
+unrolled Threefish algorithms that are even faster than Alberto's C#
+implementation. This happens because Java has all the code really
+unrolled. The C# implementation uses a lot of function calls with `ref`
+parameters. This unrolled code gives the Java JIT compiler good input for
+optimization.
 
-The standalone Threefish cipher for C has the same code basis as the Java implementation.
-Therefore also full unrolled code without loop constructs.
+The standalone Threefish cipher for C has the same code basis as the Java
+implementation.  Therefore also full unrolled code without loop constructs.
 
 
 ## Credits
