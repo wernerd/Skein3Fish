@@ -445,7 +445,7 @@ public class Skein implements ExtendedDigest {
     }
 
     public void update(byte in) {
-        byte[] tmp = new byte[1];
+        byte[] tmp = new byte[] { in };
         update(tmp, 0, 1);
     }
 
